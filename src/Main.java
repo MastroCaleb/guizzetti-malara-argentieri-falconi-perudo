@@ -1,6 +1,7 @@
 import client.Client;
 import game.bet.BetPacket;
 import game.dices.DiceValue;
+import game.players.Player;
 import server.Server;
 
 import java.util.Scanner;
@@ -8,14 +9,6 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-
-        BetPacket test = new BetPacket(3, DiceValue.TWO);
-        String testString = test.toString();
-
-        BetPacket test2 = new BetPacket();
-        test2.fromString(testString);
-
-
 
         Scanner scanner = new Scanner(System.in);
 

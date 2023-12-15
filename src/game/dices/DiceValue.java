@@ -3,7 +3,7 @@ package game.dices;
 import java.util.Random;
 
 public enum DiceValue {
-    ONE,
+    JOLLY,
     TWO,
     THREE,
     FOUR,

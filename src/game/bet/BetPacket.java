@@ -20,12 +20,14 @@ public class BetPacket implements Serializable {
     public String toString(){
         return times + ";" + diceValue;
     }
+
     public void fromString(String value){
         int index = value.indexOf(";");
         String times = value.substring(0, index);
         String dice = value.substring(index+1);
 
-        System.out.println("Times: " + times + " Dice: " + dice);
+        this.times = Integer.parseInt(times);
+        this.diceValue = DiceValue.valueOf(dice);
     }
 
 }
