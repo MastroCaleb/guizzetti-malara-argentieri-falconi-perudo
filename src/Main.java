@@ -3,12 +3,23 @@ import game.bet.BetPacket;
 import game.dices.DiceValue;
 import game.players.Player;
 import server.Server;
+import utils.Serializer;
 
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
+
+        BetPacket test = new Player().bet();
+
+        System.out.println(test.toString());
+
+        BetPacket test2 = new BetPacket();
+
+        test2.fromString(test.toString());
+
+        System.out.println(test2.toString());
 
         Scanner scanner = new Scanner(System.in);
 

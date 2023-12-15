@@ -2,13 +2,13 @@ package game.bet;
 
 import game.dices.Dice;
 import game.dices.DiceValue;
+import utils.Serializer;
 
 import java.io.Serializable;
 
 public class BetPacket implements Serializable {
-
-    private int times;
-    private DiceValue diceValue;
+    public int times;
+    public DiceValue diceValue;
 
     public BetPacket(int times, DiceValue diceValue){
         this.times = times;
@@ -18,16 +18,11 @@ public class BetPacket implements Serializable {
     }
 
     public String toString(){
-        return times + ";" + diceValue;
+        return Serializer.serializeObject(this, this.getClass().getDeclaredFields());
     }
 
     public void fromString(String value){
-        int index = value.indexOf(";");
-        String times = value.substring(0, index);
-        String dice = value.substring(index+1);
-
-        this.times = Integer.parseInt(times);
-        this.diceValue = DiceValue.valueOf(dice);
+        Serializer.deserializeObject(this, value);
     }
 
 }
