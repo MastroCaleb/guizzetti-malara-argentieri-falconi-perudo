@@ -1,5 +1,7 @@
 package client;
 
+import game.players.client.ClientPlayer;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,6 +13,7 @@ public class Client implements Runnable{
     String ip;
     int port;
 
+    ClientPlayer clientPlayer;
 
     public Client(String ip, int port){
         this.ip = ip;
@@ -24,14 +27,47 @@ public class Client implements Runnable{
             Socket socket = new Socket(ip, port);
             System.out.println("Connesso su porta: " + socket.getPort());
 
+            clientPlayer = new ClientPlayer(socket);
+
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
             String sendData;
             Scanner scan = new Scanner(System.in);
 
+            new Thread(new HandleServer(socket)).start();
+
+            while(true){
+                System.out.println("Game Menu");
+                System.out.println();
+                System.out.println("1. Create Lobby");
+                System.out.println("2. Join Lobby by Name");
+                System.out.println("3. Exit");
+                System.out.println();
+
+                String choice = scan.nextLine();
+
+                if(choice.equals("1")){
+                    output.writeUTF("LobbyList"); //Ask for list of available lobbies
+                    //Receives list
+
+                    System.out.println();
+
+                    System.out.println("Write Lobby Name: ");
+                    String lobbyName = scan.nextLine();
+
+
+                }
+                else if(choice.equals("2")){
+
+                }
+                else if(choice.equals("3")){
+                    break;
+                }
+
+            }
+
+            /*
             System.out.println("Your Nickname: ");
             String name = scan.nextLine();
-
-            new Thread(new HandleServer(socket)).start();
 
             while(true){
                 sendData = scan.nextLine();
@@ -39,6 +75,7 @@ public class Client implements Runnable{
 
                 System.out.println("You: " + sendData);
             }
+             */
         }
         catch(IOException e){
             System.out.println("ERRORE");

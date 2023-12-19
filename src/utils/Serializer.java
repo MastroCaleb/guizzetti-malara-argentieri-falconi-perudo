@@ -32,7 +32,7 @@ public class Serializer {
         return values.toString();
     }
 
-    public static <T> void deserializeObject(T object, String value) {
+    public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
         LinkedList<String> values = getValues(value, ';');
 
         for(String s : values){
@@ -43,14 +43,9 @@ public class Serializer {
     }
 
 
-    private static <T> void setField(T object, String fieldName, String value){
-        try {
-            Field field = object.getClass().getField(fieldName);
-            field.set(object, fromStringValue(field, value));
-        }
-        catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    private static <T> void setField(T object, String fieldName, String value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = object.getClass().getField(fieldName);
+        field.set(object, fromStringValue(field, value));
     }
 
     private static Object fromStringValue(Field field, String value){

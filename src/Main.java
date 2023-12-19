@@ -1,50 +1,43 @@
 import client.Client;
-import game.bet.BetPacket;
-import game.dices.DiceValue;
-import game.players.Player;
 import server.Server;
-import utils.Serializer;
 
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
+        while(true){
+            Scanner scanner = new Scanner(System.in);
 
-        BetPacket test = new Player().bet();
+            System.out.println("Start Menu");
+            System.out.println("1. Start Server");
+            System.out.println("2. Start Client");
+            System.out.println("3. Exit");
+            System.out.println();
 
-        System.out.println(test.toString());
+            String choice = scanner.nextLine();
 
-        BetPacket test2 = new BetPacket();
+            if(choice.equals("1")){
+                System.out.println("Port to connect to: ");
+                int port = scanner.nextInt();
 
-        test2.fromString(test.toString());
+                startServer(port);
+                break;
+            }
+            else if (choice.equals("2")) {
+                System.out.println("Ip to connect to: ");
+                String ip = scanner.nextLine();
 
-        System.out.println(test2.toString());
+                System.out.println("Port to connect to: ");
+                int port = scanner.nextInt();
 
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Menu");
-        System.out.println("1. Start Server");
-        System.out.println("2. Start Client");
-
-        String choice = scanner.nextLine();
-
-        if(choice.equals("1")){
-            System.out.println("Port to connect to: ");
-            int port = scanner.nextInt();
-
-            startServer(port);
+                startClient(ip, port);
+                break;
+            }
+            else if(choice.equals("3")){
+                break;
+            }
         }
-        else if (choice.equals("2")) {
-            System.out.println("Ip to connect to: ");
-            String ip = scanner.nextLine();
-
-            System.out.println("Port to connect to: ");
-            int port = scanner.nextInt();
-
-            startClient(ip, port);
-        }
-
     }
     
     static void startClient(String ip, int port){

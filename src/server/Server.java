@@ -1,5 +1,7 @@
 package server;
 
+import server.lobbies.Lobby;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,7 +10,7 @@ import java.util.LinkedList;
 public class Server implements Runnable{
 
     public static LinkedList<Socket> clients = new LinkedList<Socket>();
-
+    public static LinkedList<Lobby> lobbies = new LinkedList<Lobby>();
     int port;
 
     public Server(int port){
