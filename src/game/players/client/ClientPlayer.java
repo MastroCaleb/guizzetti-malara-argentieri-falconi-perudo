@@ -7,17 +7,15 @@ import java.net.Socket;
 
 public class ClientPlayer implements Serialized {
     private String name;
-    private Socket client;
 
-    public ClientPlayer(Socket client){
-        this.client = client;
+    public ClientPlayer(String name){
+        this.name = name;
+    }
+    public ClientPlayer(){
     }
 
     public String getName() {
         return name;
-    }
-    public Socket getClient() {
-        return client;
     }
 
     @Override

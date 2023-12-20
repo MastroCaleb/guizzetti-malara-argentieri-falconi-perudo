@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ClientServer.iml" filepath="$PROJECT_DIR$/ClientServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PerudoGruppo.iml" filepath="$PROJECT_DIR$/PerudoGruppo.iml" />
     </modules>
   </component>
 </project>

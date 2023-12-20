@@ -25,13 +25,19 @@ public class Client implements Runnable{
         try{
             System.out.println("Starting Client");
             Socket socket = new Socket(ip, port);
-            System.out.println("Connesso su porta: " + socket.getPort());
-
-            clientPlayer = new ClientPlayer(socket);
+            System.out.println("Connected to port: " + socket.getPort());
 
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-            String sendData;
+
             Scanner scan = new Scanner(System.in);
+
+
+            System.out.println("Add Your Username: ");
+            String name = scan.nextLine();
+
+            clientPlayer = new ClientPlayer(name);
+
+            output.writeUTF(clientPlayer.toString());
 
             new Thread(new HandleServer(socket)).start();
 
@@ -54,7 +60,6 @@ public class Client implements Runnable{
                     System.out.println("Write Lobby Name: ");
                     String lobbyName = scan.nextLine();
 
-
                 }
                 else if(choice.equals("2")){
 
@@ -66,8 +71,6 @@ public class Client implements Runnable{
             }
 
             /*
-            System.out.println("Your Nickname: ");
-            String name = scan.nextLine();
 
             while(true){
                 sendData = scan.nextLine();

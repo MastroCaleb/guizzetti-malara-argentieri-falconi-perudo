@@ -1,59 +1,42 @@
 package server;
 
-import server.lobbies.Lobby;
+import game.players.server.ServerPlayer;
+import server.service.HandleCommands;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.SocketException;
 
 public class HandleClient implements Runnable{
 
-    Socket client;
+    ServerPlayer player;
 
-    public HandleClient(Socket client){
-        this.client = client;
+    public HandleClient(ServerPlayer player){
+        this.player = player;
     }
 
     @Override
     public void run(){
         try{
-            if(client.isConnected()){
-                System.out.println("A client has connected.");
+            if(player.getClient().isConnected()){
+                System.out.println(player.getName() + " has connected.");
             }
 
-            while(client.isConnected()){
+            while(player.getClient().isConnected()){
                 try {
-                    DataInputStream inputStream = new DataInputStream(client.getInputStream());
+                    DataInputStream inputStream = new DataInputStream(player.getClient().getInputStream());
                     String message = inputStream.readUTF();
-
-                    if(message.equals("LobbyList")){
-                        if(Server.lobbies.isEmpty()){
-                            sendToThis("No available lobbies.");
-                        }
-                        else{
-                            String lobbyList = "";
-                            int count = 0;
-                            for(Lobby lobby : Server.lobbies){
-                                if(lobby.isPublic()){
-                                    count++;
-                                    lobbyList = count + ". " + lobby.getName() + " " + lobby.playerCount() + "\n";
-                                }
-                            }
-                            sendToThis(lobbyList);
-                        }
-                    }
                 }
                 catch (SocketException e) {
-                    client.close();
-                    Server.clients.remove(client);
+                    player.getClient().close();
+                    Server.clients.remove(player);
                     break;
                 }
             }
 
-            if(client.isClosed()){
-                System.out.println("A client has disconnected.");
+            if(player.getClient().isClosed()){
+                System.out.println(player.getName() + " has disconnected.");
             }
         }
         catch(IOException e){
@@ -61,19 +44,10 @@ public class HandleClient implements Runnable{
         }
     }
 
-    void sendToThis(String message) throws IOException {
-        for(Socket c : Server.clients){
-            if(c.equals(client)) {
-                DataOutputStream outputStream = new DataOutputStream(c.getOutputStream());
-                outputStream.writeUTF(message);
-            }
-        }
-    }
-
     void sendToAll(String message) throws IOException {
-        for(Socket c : Server.clients){
-            if(!c.equals(client)) {
-                DataOutputStream outputStream = new DataOutputStream(c.getOutputStream());
+        for(ServerPlayer c : Server.clients){
+            if(!c.equals(player)) {
+                DataOutputStream outputStream = new DataOutputStream(c.getClient().getOutputStream());
                 outputStream.writeUTF(message);
             }
         }
@@ -83,25 +57,27 @@ public class HandleClient implements Runnable{
 
     void chatSystem(){
         try{
-            if(client.isConnected()){
+            new Thread(new HandleCommands(player.getClient()));
+
+            if(player.getClient().isConnected()){
                 System.out.println("A client has connected.");
             }
 
-            while(client.isConnected()){
+            while(player.getClient().isConnected()){
                 try {
-                    DataInputStream inputStream = new DataInputStream(client.getInputStream());
+                    DataInputStream inputStream = new DataInputStream(player.getClient().getInputStream());
                     String message = inputStream.readUTF();
                     System.out.println(message);
                     sendToAll(message);
                 }
                 catch (SocketException e) {
-                    client.close();
-                    Server.clients.remove(client);
+                    player.getClient().close();
+                    Server.clients.remove(player);
                     break;
                 }
             }
 
-            if(client.isClosed()){
+            if(player.getClient().isClosed()){
                 System.out.println("A client has disconnected.");
             }
         }

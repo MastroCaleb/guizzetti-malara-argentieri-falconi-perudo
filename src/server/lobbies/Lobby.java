@@ -7,11 +7,8 @@ import java.util.LinkedList;
 
 public class Lobby implements Runnable{
 
-    private Socket host;
     private LobbySettings lobbySettings;
     private LinkedList<ServerPlayer> players = new LinkedList<ServerPlayer>();
-
-
     public Lobby(LobbySettings lobbySettings){
         this.lobbySettings = lobbySettings;
     }

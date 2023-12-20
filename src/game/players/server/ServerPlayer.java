@@ -14,13 +14,21 @@ public class ServerPlayer {
     private Socket client;
     private LinkedList<Dice> dices = new LinkedList<Dice>();
 
-    public ServerPlayer(ClientPlayer clientPlayer){
+    public ServerPlayer(ClientPlayer clientPlayer, Socket client){
         this.name = clientPlayer.getName();
-        this.client = clientPlayer.getClient();
+        this.client = client;
 
         for(int i=0; i<5; i++){
             dices.add(new Dice());
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Socket getClient() {
+        return client;
     }
 
     public void rollAll(){
