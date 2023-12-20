@@ -1,21 +1,20 @@
-package game.players.server;
+package game.player;
 
 import game.bet.Bet;
 import game.dices.Dice;
 import game.dices.DiceValue;
-import game.players.client.ClientPlayer;
 
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-public class ServerPlayer {
+public class Player {
     private String name;
     private Socket client;
     private LinkedList<Dice> dices = new LinkedList<Dice>();
 
-    public ServerPlayer(ClientPlayer clientPlayer, Socket client){
-        this.name = clientPlayer.getName();
+    public Player(String name, Socket client){
+        this.name = name;
         this.client = client;
 
         for(int i=0; i<5; i++){
@@ -26,7 +25,6 @@ public class ServerPlayer {
     public String getName() {
         return name;
     }
-
     public Socket getClient() {
         return client;
     }

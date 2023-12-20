@@ -8,6 +8,7 @@ import java.io.Serial;
 public class LobbySettings implements Serialized{
     private String lobbyName;
     private boolean isPublic = true;
+    private String password = "";
     private int maxPlayers = 6;
     private int maxDices = 5;
 

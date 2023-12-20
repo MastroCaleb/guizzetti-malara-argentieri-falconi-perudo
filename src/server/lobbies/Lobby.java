@@ -1,14 +1,13 @@
 package server.lobbies;
 
-import game.players.server.ServerPlayer;
+import game.player.Player;
 
-import java.net.Socket;
 import java.util.LinkedList;
 
 public class Lobby implements Runnable{
 
     private LobbySettings lobbySettings;
-    private LinkedList<ServerPlayer> players = new LinkedList<ServerPlayer>();
+    private LinkedList<Player> players = new LinkedList<Player>();
     public Lobby(LobbySettings lobbySettings){
         this.lobbySettings = lobbySettings;
     }
@@ -18,7 +17,8 @@ public class Lobby implements Runnable{
 
     }
 
-    public void addPlayer(){
+    public void addPlayer(Player player){
+        players.add(player);
     }
 
     public String playerCount(){

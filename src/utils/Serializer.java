@@ -19,6 +19,9 @@ public class Serializer {
                 if(count == fields.length-1){
                     values.append(field.getName()).append(":").append(field.get(object));
                 }
+                else if (fields.length == 1) {
+                    values.append(field.getName()).append(":").append(field.get(object));
+                }
                 else{
                     values.append(field.getName()).append(":").append(field.get(object)).append(";");
                 }

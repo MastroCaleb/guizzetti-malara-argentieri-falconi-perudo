@@ -1,13 +1,11 @@
 package server.service.command;
 
-import game.players.server.ServerPlayer;
+import game.player.Player;
 import server.Server;
-import utils.Serializer;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.LinkedList;
 
 public class Command {
     private String command;
@@ -22,7 +20,7 @@ public class Command {
     public void run(Socket client) throws IOException {}
 
     void sendToThis(Socket client, String message) throws IOException {
-        for(ServerPlayer c : Server.clients){
+        for(Player c : Server.clients){
             if(c.equals(client)) {
                 DataOutputStream outputStream = new DataOutputStream(c.getClient().getOutputStream());
                 outputStream.writeUTF(message);

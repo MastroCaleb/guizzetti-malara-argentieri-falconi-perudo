@@ -1,6 +1,6 @@
 package client;
 
-import game.players.client.ClientPlayer;
+import server.lobbies.LobbySettings;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -12,8 +12,6 @@ public class Client implements Runnable{
 
     String ip;
     int port;
-
-    ClientPlayer clientPlayer;
 
     public Client(String ip, int port){
         this.ip = ip;
@@ -31,13 +29,10 @@ public class Client implements Runnable{
 
             Scanner scan = new Scanner(System.in);
 
-
             System.out.println("Add Your Username: ");
             String name = scan.nextLine();
 
-            clientPlayer = new ClientPlayer(name);
-
-            output.writeUTF(clientPlayer.toString());
+            output.writeUTF(name);
 
             new Thread(new HandleServer(socket)).start();
 
@@ -52,6 +47,10 @@ public class Client implements Runnable{
                 String choice = scan.nextLine();
 
                 if(choice.equals("1")){
+
+
+                }
+                else if(choice.equals("2")){
                     output.writeUTF("LobbyList"); //Ask for list of available lobbies
                     //Receives list
 
@@ -59,10 +58,6 @@ public class Client implements Runnable{
 
                     System.out.println("Write Lobby Name: ");
                     String lobbyName = scan.nextLine();
-
-                }
-                else if(choice.equals("2")){
-
                 }
                 else if(choice.equals("3")){
                     break;

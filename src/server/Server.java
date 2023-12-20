@@ -1,7 +1,6 @@
 package server;
 
-import game.players.client.ClientPlayer;
-import game.players.server.ServerPlayer;
+import game.player.Player;
 import server.lobbies.Lobby;
 
 import java.io.DataInputStream;
@@ -12,7 +11,7 @@ import java.util.LinkedList;
 
 public class Server implements Runnable{
 
-    public static LinkedList<ServerPlayer> clients = new LinkedList<ServerPlayer>();
+    public static LinkedList<Player> clients = new LinkedList<Player>();
     public static LinkedList<Lobby> lobbies = new LinkedList<Lobby>();
     int port;
 
@@ -32,24 +31,14 @@ public class Server implements Runnable{
 
                 data = new DataInputStream(client.getInputStream()).readUTF();
 
-                System.out.println(data);
+                Player player = new Player(data, client);
 
-                ClientPlayer clientPlayer = new ClientPlayer();
-                clientPlayer.fromString(data);
-
-                System.out.println(clientPlayer.getName());
-
-                ServerPlayer serverPlayer = new ServerPlayer(clientPlayer, client);
-
-                clients.add(serverPlayer);
-                new Thread(new HandleClient(serverPlayer)).start();
+                clients.add(player);
+                new Thread(new HandleClient(player)).start();
             }
         }
         catch (IOException e) {
             e.printStackTrace();
-        }
-        catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
         }
     }
 }

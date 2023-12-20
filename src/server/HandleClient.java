@@ -1,6 +1,6 @@
 package server;
 
-import game.players.server.ServerPlayer;
+import game.player.Player;
 import server.service.HandleCommands;
 
 import java.io.DataInputStream;
@@ -10,15 +10,16 @@ import java.net.SocketException;
 
 public class HandleClient implements Runnable{
 
-    ServerPlayer player;
+    Player player;
 
-    public HandleClient(ServerPlayer player){
+    public HandleClient(Player player){
         this.player = player;
     }
 
     @Override
     public void run(){
         try{
+
             if(player.getClient().isConnected()){
                 System.out.println(player.getName() + " has connected.");
             }
@@ -45,7 +46,7 @@ public class HandleClient implements Runnable{
     }
 
     void sendToAll(String message) throws IOException {
-        for(ServerPlayer c : Server.clients){
+        for(Player c : Server.clients){
             if(!c.equals(player)) {
                 DataOutputStream outputStream = new DataOutputStream(c.getClient().getOutputStream());
                 outputStream.writeUTF(message);
