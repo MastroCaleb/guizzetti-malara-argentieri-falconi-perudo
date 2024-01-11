@@ -6,12 +6,12 @@ import utils.interfaces.Serialized;
 
 public class LobbySettings implements Serialized {
     private String lobbyCode = "";
-    private boolean isPublic = true;
+    private boolean isPublic;
     private String password = "";
     private int maxPlayers = 6;
     private int minPlayers = 2;
     private int maxDices = 5;
-    private boolean jollies = false;
+    private boolean jollies;
 
     public LobbySettings(String lobbyCode, String settings) {
         try {
@@ -63,6 +63,7 @@ public class LobbySettings implements Serialized {
     public void packetToObject(String lobbyCode, String settings) throws NoSuchFieldException, IllegalAccessException {
         LobbySettingsPacket packet = new LobbySettingsPacket();
         packet.read(settings);
+
         LobbySettings lobbySettings = new LobbySettings(lobbyCode, packet.isPublic(), packet.getPassword(), packet.getMaxPlayers(), packet.getMinPlayers(), packet.getMaxDices(), packet.useJollies());
         this.read(lobbySettings.toString());
     }

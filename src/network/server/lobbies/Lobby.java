@@ -26,6 +26,7 @@ public class Lobby implements Runnable {
         this.lobbySettings = lobbySettings;
     }
 
+    @Override
     public void run() {
         System.out.println("A Lobby was created successfully.");
         try {
@@ -60,6 +61,7 @@ public class Lobby implements Runnable {
                 if(this.players.isEmpty()){
                     this.LOGGER.log(Level.WARNING, "Lobby was found empty. Shutting down.");
                     Server.lobbies.remove(this);
+                    break;
                 }
             }
         }

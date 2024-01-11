@@ -25,6 +25,7 @@ public class Server implements Runnable {
         this.serverSocket = new ServerSocket(port);
     }
 
+    @Override
     public void run() {
         System.out.println("Server Started");
         try{
@@ -63,7 +64,6 @@ public class Server implements Runnable {
     }
 
     public static boolean nickIsUsed(String name){
-
         if(players.isEmpty()){
             return false;
         }

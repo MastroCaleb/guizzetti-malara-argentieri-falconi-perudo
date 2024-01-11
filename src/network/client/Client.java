@@ -29,6 +29,7 @@ public class Client implements Runnable {
         this.client = new Socket(ip, port);
     }
 
+    @Override
     public void run() {
         try {
             DataOutputStream outputStream = new DataOutputStream(this.client.getOutputStream());
@@ -53,6 +54,7 @@ public class Client implements Runnable {
                     System.out.println();
                     System.out.println("1. Create New Lobby");
                     System.out.println("2. Join Lobby");
+                    System.out.println("3. Update Lobby List");
 
                     String choice = In.nextLine();
 
@@ -66,9 +68,12 @@ public class Client implements Runnable {
                         System.out.println();
                         System.out.println("Type the code of the lobby you want to join: ");
 
-                        String password = In.nextLine();
+                        String code = In.nextLine();
 
-                        outputStream.writeUTF("joinLobby:" + password);
+                        outputStream.writeUTF("joinLobby:" + code);
+                    }
+                    else if (choice.equals("3")){
+                        outputStream.writeUTF("updateLobby");
                     }
                 }
                 else if (canSendLobbySettings) {
@@ -149,6 +154,7 @@ public class Client implements Runnable {
 
                     clientMessageThread.stopWaiting();
 
+                    System.out.println(lobbySettingsPacket.write());
                     outputStream.writeUTF(lobbySettingsPacket.write());
 
                 }
@@ -156,11 +162,11 @@ public class Client implements Runnable {
                     canSendPassword = false;
 
                     System.out.println("Enter the password: ");
-                    String choice = In.nextLine();
+                    String password = In.nextLine();
 
                     clientMessageThread.stopWaiting();
 
-                    outputStream.writeUTF(choice);
+                    outputStream.writeUTF(password);
                 }
                 else if (canStartGame) {
                     canStartGame = false;

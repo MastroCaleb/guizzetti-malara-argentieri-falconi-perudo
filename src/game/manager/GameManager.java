@@ -135,8 +135,7 @@ public class GameManager implements Runnable {
 
                                     break;
                                 }
-
-                                if (choice.equals("2")) {
+                                else if (choice.equals("2")) {
                                     while(true) {
                                         player.sendToThis("[--NEW BET--]");
                                         player.sendToThis("");
@@ -166,6 +165,7 @@ public class GameManager implements Runnable {
                                             }
                                         }
                                     }
+                                    break;
                                 }
 
                                 player.sendToThis("Not a choice that you can make.");
