@@ -1,28 +1,38 @@
 package game.bet;
 
-import game.dices.DiceValue;
-import utils.Serializer;
-import utils.interfaces.Serialized;
+import game.player.Player;
+import network.packets.bet.BetPacket;
 
-public class Bet implements Serialized {
-    public int times;
-    public DiceValue diceValue;
+public class Bet {
+    private Player player;
+    private int diceValue = 0;
+    private int diceNumber = 0;
 
-    public Bet(int times, DiceValue diceValue){
-        this.times = times;
+    public Bet(Player player, int diceValue, int diceNumber) {
+        this.player = player;
         this.diceValue = diceValue;
-    }
-    public Bet(){
-    }
-
-    @Override
-    public String toString(){
-        return Serializer.serializeObject(this, this.getClass().getDeclaredFields());
+        this.diceNumber = diceNumber;
     }
 
-    @Override
-    public void fromString(String value) throws NoSuchFieldException, IllegalAccessException {
-        Serializer.deserializeObject(this, value);
+    public Bet(Player player, BetPacket betPacket) {
+        this.player = player;
+        this.diceValue = betPacket.getDiceValue();
+        this.diceNumber = betPacket.getDiceNumber();
     }
 
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    public int getDiceValue() {
+        return this.diceValue;
+    }
+
+    public int getDiceNumber() {
+        return this.diceNumber;
+    }
+
+    public String toString() {
+        return "(Dice Value: " + this.diceValue + " | Betted Number: " + this.diceNumber + ")";
+    }
 }

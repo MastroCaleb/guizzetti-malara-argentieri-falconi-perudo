@@ -1,18 +1,27 @@
 package game.dices;
 
+import java.util.Random;
+
 public class Dice {
+    private int value;
+    private boolean jollies = false;
 
-    private DiceValue diceValue;
-
-    public Dice(DiceValue diceValue){
-        this.diceValue = diceValue;
-    }
-    public Dice(){
-        rollDice();
+    public Dice(boolean jollies) {
+        this.jollies = jollies;
+        this.roll();
     }
 
-    public void rollDice(){
-        this.diceValue = DiceValue.randomDiceValue();
+    public int getValue() {
+        return this.value;
     }
 
+    public String toString() {
+        return this.value == 1 ? "J" : "" + this.value;
+    }
+
+    public void roll() {
+        Random random = new Random();
+        int min = this.jollies ? 1 : 2;
+        this.value = random.nextInt(min, 7);
+    }
 }
