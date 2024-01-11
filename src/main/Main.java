@@ -28,6 +28,7 @@ public class Main {
                     int port = In.nextInt();
 
                     (new Thread(new Server(port))).start();
+                    break;
                 }
                 else if (choice.equals("2")) {
 
@@ -38,6 +39,7 @@ public class Main {
                     int port = In.nextInt();
 
                     (new Thread(new Client(ip, port))).start();
+                    break;
                 }
                 else if (!choice.equals("3")) {
                     break;

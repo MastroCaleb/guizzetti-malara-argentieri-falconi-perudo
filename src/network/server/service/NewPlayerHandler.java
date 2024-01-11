@@ -75,7 +75,8 @@ public class NewPlayerHandler implements Runnable {
             }
         }
         catch (IOException var7) {
-            this.LOGGER.log(Level.SEVERE, "IO Error");
+            Server.players.remove(player);
+            return;
         }
     }
 }

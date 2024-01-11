@@ -20,6 +20,10 @@ public class ClientMessageThread implements Runnable {
                 String message = inputStream.readUTF();
 
                 switch (message) {
+                    case "askNickName" -> {
+                        Client.canSendNick = true;
+                        this.stopWaiting();
+                    }
                     case "askCreateOrJoinLobby" -> {
                         Client.canCreateOrJoin = true;
                         this.startWaiting();

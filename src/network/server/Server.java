@@ -32,11 +32,26 @@ public class Server implements Runnable {
                 Socket client = this.serverSocket.accept();
 
                 DataInputStream inputStream = new DataInputStream(client.getInputStream());
-                String name = inputStream.readUTF();
+
+                Player player = new Player("Unnamed", client);
+
+                String name = "Unnamed";
+                while(true){
+                    player.sendToThis("askNickName");
+
+                    name = inputStream.readUTF();
+
+                    if(!nickIsUsed(name)){
+                        player = new Player(name, client);
+                        break;
+                    }
+                    else{
+                        player.sendToThis("Nickname not available.");
+                    }
+                }
 
                 this.LOGGER.log(Level.INFO, name + " has connected to the server.");
 
-                Player player = new Player(name, client);
                 players.add(player);
 
                 (new Thread(new NewPlayerHandler(player))).start();
@@ -47,12 +62,25 @@ public class Server implements Runnable {
         }
     }
 
+    public static boolean nickIsUsed(String name){
+
+        if(players.isEmpty()){
+            return false;
+        }
+
+        for(Player player : players){
+            if(player.getName().equals(name)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static Lobby getLobbyFromCode(String code) {
         Lobby lobbyFound = null;
-        Iterator var2 = lobbies.iterator();
 
-        while(var2.hasNext()) {
-            Lobby lobby = (Lobby)var2.next();
+        for(Lobby lobby : lobbies) {
             if (lobby.getCode().equals(code)) {
                 lobbyFound = lobby;
             }
@@ -67,10 +95,8 @@ public class Server implements Runnable {
         } else {
             String lobbyList = "";
             int count = 0;
-            Iterator var2 = lobbies.iterator();
 
-            while(var2.hasNext()) {
-                Lobby lobby = (Lobby)var2.next();
+            for(Lobby lobby :  lobbies) {
                 if (lobby.isPublic()) {
                     ++count;
                     lobbyList = "" + count + ". " + lobby.getCode() + " " + lobby.playerCount() + "\n";

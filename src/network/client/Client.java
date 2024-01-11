@@ -10,6 +10,7 @@ import network.packets.settings.LobbySettingsPacket;
 import utils.In;
 
 public class Client implements Runnable {
+    public static volatile boolean canSendNick = false;
     public static volatile boolean canCreateOrJoin = false;
     public static volatile boolean canSendLobbySettings = false;
     public static volatile boolean canSendPassword = false;
@@ -30,14 +31,23 @@ public class Client implements Runnable {
 
     public void run() {
         try {
-            System.out.println("Insert your nickname: ");
             DataOutputStream outputStream = new DataOutputStream(this.client.getOutputStream());
-            outputStream.writeUTF(In.nextLine());
             ClientMessageThread clientMessageThread = new ClientMessageThread(this.client);
+
             (new Thread(clientMessageThread)).start();
 
             while(true) {
-                if (canCreateOrJoin) {
+                if(canSendNick){
+                    canSendNick = false;
+                    System.out.println("[--PROFILE--]");
+                    System.out.println("Insert your nickname: ");
+                    String name = In.nextLine();
+
+                    clientMessageThread.stopWaiting();
+
+                    outputStream.writeUTF(name);
+                }
+                else if (canCreateOrJoin) {
                     canCreateOrJoin = false;
                     System.out.println("[--CREATE OR JOIN--]");
                     System.out.println();
@@ -61,8 +71,7 @@ public class Client implements Runnable {
                         outputStream.writeUTF("joinLobby:" + password);
                     }
                 }
-
-                if (canSendLobbySettings) {
+                else if (canSendLobbySettings) {
                     canSendLobbySettings = false;
 
                     boolean isPublic;
