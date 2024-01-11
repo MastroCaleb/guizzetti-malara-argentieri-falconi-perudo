@@ -110,10 +110,7 @@ public class Server implements Runnable {
     public static String getRandomCode() {
         String code = String.valueOf((new Random()).nextInt(10000, 100000));
         if (!lobbies.isEmpty()) {
-            Iterator var1 = lobbies.iterator();
-
-            while(var1.hasNext()) {
-                Lobby lobby = (Lobby)var1.next();
+            for(Lobby lobby : lobbies) {
                 if (lobby.getCode().equals(code)) {
                     code = String.valueOf((new Random()).nextInt(10000, 100000));
                 }
