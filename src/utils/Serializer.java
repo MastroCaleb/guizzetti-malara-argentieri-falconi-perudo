@@ -23,7 +23,7 @@ public class Serializer {
                     values.append(field.getName()).append(":").append(field.get(object)).append(";");
                 }
 
-                ++count;
+                count++;
             }
         }
         catch (IllegalAccessException var8) {
@@ -35,12 +35,7 @@ public class Serializer {
 
     public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
 
-        System.out.println(value);
         LinkedList<String> values = getValues(value, ';');
-
-        for(String s : values) {
-            System.out.println(s);
-        }
 
         for(String s : values) {
             LinkedList<String> temp = getValues(s, ':');
@@ -81,19 +76,13 @@ public class Serializer {
                 values.add(value.substring((Integer)indexes.get(i) + 1));
             }
             else if (i == 0) {
-                String temp = value.substring(0, (Integer)indexes.get(i));
-                values.add(temp);
-                System.out.println(temp);
+                values.add(value.substring(0, (Integer)indexes.get(i)));
             }
             else if (i == dividers - 1) {
-                String temp = value.substring((Integer)indexes.get(i) + 1);
-                values.add(temp);
-                System.out.println(temp);
+                values.add(value.substring((Integer)indexes.get(i) + 1));
             }
             else {
-                String temp = value.substring((Integer)indexes.get(i) + 1, (Integer)indexes.get(i + 1));
-                values.add(temp);
-                System.out.println(temp);
+                values.add(value.substring((Integer)indexes.get(i) + 1, (Integer)indexes.get(i + 1)));
             }
         }
 

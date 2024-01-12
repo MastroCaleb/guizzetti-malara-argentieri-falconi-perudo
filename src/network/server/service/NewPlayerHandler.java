@@ -44,13 +44,9 @@ public class NewPlayerHandler implements Runnable {
                     LobbySettings lobbySettings = new LobbySettings(code, settings);
                     Lobby lobby = new Lobby(this.player, lobbySettings);
 
-                    System.out.println(lobby.getSettings().toString());
-
                     player.sendToThis("The code for your lobby is: " + code);
 
                     lobby.joinLobby(this.player);
-
-                    System.out.println(lobby.isPublic());
 
                     Server.lobbies.add(lobby);
                     (new Thread(lobby)).start();
@@ -60,8 +56,6 @@ public class NewPlayerHandler implements Runnable {
 
                     String code = createOrJoin.replace("joinLobby:", "");
                     Lobby lobby = Server.getLobbyFromCode(code);
-
-                    System.out.println(lobby.isPublic());
 
                     while(true){
                         if (lobby == null) {
