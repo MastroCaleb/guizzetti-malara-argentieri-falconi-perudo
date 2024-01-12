@@ -36,13 +36,17 @@ public class Serializer {
 
     //Apparently has huge bug
     public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
-        System.out.println(value);
         LinkedList<String> values = getValues(value, ';');
-        System.out.println(values);
 
         for(String s : values) {
             LinkedList<String> temp = getValues(s, ':');
-            setField(object, (String)temp.get(0), (String)temp.get(1));
+
+            if(temp.size() == 1){
+                setField(object, (String)temp.get(0), "");
+            }
+            else{
+                setField(object, (String)temp.get(0), (String)temp.get(1));
+            }
         }
     }
 
@@ -68,9 +72,8 @@ public class Serializer {
     }
 
     private static LinkedList<String> getValues(String value, char divider) {
-        String[] arrSplit = value.split(";");
-        LinkedList<String> values = new LinkedList<>;
-        for (String s : arrSplit){
+        LinkedList<String> values = new LinkedList<String>();
+        for (String s : value.split(divider+"")){
             values.add(s);
         }
         return values;
