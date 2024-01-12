@@ -34,8 +34,8 @@ public class ClientMessageThread implements Runnable {
                         this.startWaiting();
                     }
                     case "askForPassword" -> {
-                           Client.canSendPassword = true;
-                           this.startWaiting();
+                        Client.canSendPassword = true;
+                        this.startWaiting();
                     }
                     case "askStartGame" -> {
                         System.out.println("Minimum number of players reached.");
@@ -57,7 +57,6 @@ public class ClientMessageThread implements Runnable {
                     default -> {System.out.println(message);}
                 }
             }
-
         }
         catch (IOException var5) {
             System.out.println("Problem getting messages.");

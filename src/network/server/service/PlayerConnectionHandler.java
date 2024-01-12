@@ -18,7 +18,7 @@ public class PlayerConnectionHandler implements Runnable {
     @Override
     public void run() {
         try {
-            while (this.player.getClient().isConnected()) {
+            while (true) {
                 try {
                     DataInputStream inputStream = new DataInputStream(this.player.getClient().getInputStream());
                     String message = inputStream.readUTF();

@@ -34,7 +34,13 @@ public class Serializer {
     }
 
     public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
+
+        System.out.println(value);
         LinkedList<String> values = getValues(value, ';');
+
+        for(String s : values) {
+            System.out.println(s);
+        }
 
         for(String s : values) {
             LinkedList<String> temp = getValues(s, ':');
@@ -54,35 +60,14 @@ public class Serializer {
     }
 
     private static Object toObject(Class clazz, String value) {
-        if (Boolean.class != clazz && Boolean.TYPE != clazz) {
-            if (Byte.class != clazz && Byte.TYPE != clazz) {
-                if (Short.class != clazz && Short.TYPE != clazz) {
-                    if (Integer.class != clazz && Integer.TYPE != clazz) {
-                        if (Long.class != clazz && Long.TYPE != clazz) {
-                            if (Float.class != clazz && Float.TYPE != clazz) {
-                                if (Double.class != clazz && Double.TYPE != clazz) {
-                                    return clazz.isEnum() ? Enum.valueOf(clazz, value) : value;
-                                } else {
-                                    return Double.parseDouble(value);
-                                }
-                            } else {
-                                return Float.parseFloat(value);
-                            }
-                        } else {
-                            return Long.parseLong(value);
-                        }
-                    } else {
-                        return Integer.parseInt(value);
-                    }
-                } else {
-                    return Short.parseShort(value);
-                }
-            } else {
-                return Byte.parseByte(value);
-            }
-        } else {
-            return Boolean.parseBoolean(value);
-        }
+        if(Boolean.class == clazz || boolean.class == clazz) return Boolean.parseBoolean( value );
+        if(Byte.class == clazz || byte.class == clazz) return Byte.parseByte( value );
+        if(Short.class == clazz || short.class == clazz) return Short.parseShort( value );
+        if(Integer.class == clazz || int.class == clazz) return Integer.parseInt( value );
+        if(Long.class == clazz || long.class == clazz) return Long.parseLong( value );
+        if(Float.class == clazz || float.class == clazz) return Float.parseFloat( value );
+        if(Double.class == clazz || double.class == clazz) return Double.parseDouble( value );
+        return value;
     }
 
     private static LinkedList<String> getValues(String value, char divider) {
@@ -90,19 +75,25 @@ public class Serializer {
         LinkedList<Integer> indexes = getDividersIndexes(value, divider);
         LinkedList<String> values = new LinkedList<String>();
 
-        for(int i = 0; i < dividers; ++i) {
+        for(int i = 0; i < dividers; i++) {
             if (i == 0 && dividers == 1) {
                 values.add(value.substring(0, (Integer)indexes.get(i)));
                 values.add(value.substring((Integer)indexes.get(i) + 1));
             }
             else if (i == 0) {
-                values.add(value.substring(0, (Integer)indexes.get(i)));
+                String temp = value.substring(0, (Integer)indexes.get(i));
+                values.add(temp);
+                System.out.println(temp);
             }
             else if (i == dividers - 1) {
-                values.add(value.substring((Integer)indexes.get(i) + 1));
+                String temp = value.substring((Integer)indexes.get(i) + 1);
+                values.add(temp);
+                System.out.println(temp);
             }
             else {
-                values.add(value.substring((Integer)indexes.get(i) + 1, (Integer)indexes.get(i + 1)));
+                String temp = value.substring((Integer)indexes.get(i) + 1, (Integer)indexes.get(i + 1));
+                values.add(temp);
+                System.out.println(temp);
             }
         }
 
@@ -123,13 +114,12 @@ public class Serializer {
 
     private static LinkedList<Integer> getDividersIndexes(String value, char divider) {
         int index = 0;
-        LinkedList<Integer> indexes = new LinkedList();
+        LinkedList<Integer> indexes = new LinkedList<Integer>();
 
         for(char t : value.toCharArray()) {
             if (t == divider) {
                 indexes.add(index);
             }
-
             index++;
         }
 

@@ -118,11 +118,6 @@ public class Client implements Runnable {
                         maxPlayers = In.nextInt();
                     }
 
-                    while(minPlayers <= 1) {
-                        System.out.println("Set MIN number of Players in the lobby: (Default is 2, minimum is 2)");
-                        minPlayers = In.nextInt();
-                    }
-
                     while(maxDices <= 0) {
                         System.out.println("Set MAX number of dices for each Player in the lobby: (Default is 5, minimum is 1)");
                         maxDices = In.nextInt();
@@ -150,11 +145,10 @@ public class Client implements Runnable {
                         }
                     }
 
-                    LobbySettingsPacket lobbySettingsPacket = new LobbySettingsPacket(isPublic, password, maxPlayers, minPlayers, maxDices, jollies);
+                    LobbySettingsPacket lobbySettingsPacket = new LobbySettingsPacket(isPublic, password, maxPlayers, maxDices, jollies);
 
                     clientMessageThread.stopWaiting();
 
-                    System.out.println(lobbySettingsPacket.write());
                     outputStream.writeUTF(lobbySettingsPacket.write());
 
                 }

@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
@@ -35,29 +36,34 @@ public class Server implements Runnable {
                 DataInputStream inputStream = new DataInputStream(client.getInputStream());
 
                 Player player = new Player("Unnamed", client);
+                try{
 
-                String name = "Unnamed";
-                while(true){
-                    player.sendToThis("askNickName");
+                    String name = "Unnamed";
+                    while (true) {
+                        player.sendToThis("askNickName");
 
-                    name = inputStream.readUTF();
+                        name = inputStream.readUTF();
 
-                    if(!nickIsUsed(name)){
-                        player = new Player(name, client);
-                        break;
+                        if (!nickIsUsed(name)) {
+                            player = new Player(name, client);
+                            break;
+                        } else {
+                            player.sendToThis("Nickname not available.");
+                        }
                     }
-                    else{
-                        player.sendToThis("Nickname not available.");
-                    }
+
+                    this.LOGGER.log(Level.INFO, name + " has connected to the server.");
+
+                    players.add(player);
+
+                    (new Thread(new NewPlayerHandler(player))).start();
                 }
-
-                this.LOGGER.log(Level.INFO, name + " has connected to the server.");
-
-                players.add(player);
-
-                (new Thread(new NewPlayerHandler(player))).start();
+                catch(SocketException e){
+                    players.remove(player);
+                }
             }
         }
+
         catch (IOException e) {
             this.LOGGER.log(Level.SEVERE, "IOException caught. Closing Server.");
         }
@@ -92,15 +98,20 @@ public class Server implements Runnable {
     public static String getLobbyList() {
         if (lobbies.isEmpty()) {
             return "No public lobbies available.";
-        } else {
+        }
+        else {
             String lobbyList = "";
             int count = 0;
 
-            for(Lobby lobby :  lobbies) {
+            for(Lobby lobby : lobbies) {
                 if (lobby.isPublic()) {
-                    ++count;
+                    count++;
                     lobbyList = "" + count + ". " + lobby.getCode() + " " + lobby.playerCount() + "\n";
                 }
+            }
+
+            if(count == 0){
+                return "No public lobbies available.";
             }
 
             return lobbyList;

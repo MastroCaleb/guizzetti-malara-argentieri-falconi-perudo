@@ -2,6 +2,7 @@ package network.packets.action;
 
 import network.packets.Packet;
 
+@Deprecated
 public class ActionPacket extends Packet {
     private String choice;
 

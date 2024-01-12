@@ -6,10 +6,9 @@ import utils.interfaces.Serialized;
 
 public class LobbySettings implements Serialized {
     private String lobbyCode = "";
-    private boolean isPublic;
     private String password = "";
+    private boolean isPublic;
     private int maxPlayers = 6;
-    private int minPlayers = 2;
     private int maxDices = 5;
     private boolean jollies;
 
@@ -22,12 +21,11 @@ public class LobbySettings implements Serialized {
         }
     }
 
-    public LobbySettings(String lobbyCode, boolean isPublic, String password, int maxPlayers, int minPlayers, int maxDices, boolean jollies) {
+    public LobbySettings(String lobbyCode, boolean isPublic, String password, int maxPlayers, int maxDices, boolean jollies) {
         this.lobbyCode = lobbyCode;
         this.isPublic = isPublic;
         this.password = password;
         this.maxPlayers = maxPlayers;
-        this.minPlayers = minPlayers;
         this.maxDices = maxDices;
         this.jollies = jollies;
     }
@@ -48,10 +46,6 @@ public class LobbySettings implements Serialized {
         return this.maxPlayers;
     }
 
-    public int getMinPlayers() {
-        return this.minPlayers;
-    }
-
     public int getMaxDices() {
         return this.maxDices;
     }
@@ -64,8 +58,9 @@ public class LobbySettings implements Serialized {
         LobbySettingsPacket packet = new LobbySettingsPacket();
         packet.read(settings);
 
-        LobbySettings lobbySettings = new LobbySettings(lobbyCode, packet.isPublic(), packet.getPassword(), packet.getMaxPlayers(), packet.getMinPlayers(), packet.getMaxDices(), packet.useJollies());
+        LobbySettings lobbySettings = new LobbySettings(lobbyCode, packet.isPublic(), packet.getPassword(), packet.getMaxPlayers(), packet.getMaxDices(), packet.useJollies());
         this.read(lobbySettings.toString());
+        System.out.println(lobbySettings.toString());
     }
 
     public String toString() {

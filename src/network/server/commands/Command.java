@@ -3,6 +3,7 @@ package network.server.commands;
 import java.io.IOException;
 import java.net.Socket;
 
+@Deprecated
 public class Command {
     private String command;
 

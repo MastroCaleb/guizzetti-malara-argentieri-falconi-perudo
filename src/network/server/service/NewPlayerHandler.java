@@ -44,9 +44,13 @@ public class NewPlayerHandler implements Runnable {
                     LobbySettings lobbySettings = new LobbySettings(code, settings);
                     Lobby lobby = new Lobby(this.player, lobbySettings);
 
-                    player.sendToThis("The code for your private lobby is: " + code);
+                    System.out.println(lobby.getSettings().toString());
+
+                    player.sendToThis("The code for your lobby is: " + code);
 
                     lobby.joinLobby(this.player);
+
+                    System.out.println(lobby.isPublic());
 
                     Server.lobbies.add(lobby);
                     (new Thread(lobby)).start();
@@ -63,6 +67,10 @@ public class NewPlayerHandler implements Runnable {
                         if (lobby == null) {
                             System.out.println("No Lobby with this code was found.");
                         }
+                        else if(lobby.isPublic()){
+                            lobby.joinLobby(this.player);
+                            break;
+                        }
                         else if(!lobby.isPublic()){
                             System.out.println("Lobby is not public so ask the password.");
                             this.player.sendToThis("askForPassword");
@@ -77,10 +85,6 @@ public class NewPlayerHandler implements Runnable {
                             else{
                                 this.player.sendToThis("Wrong password.");
                             }
-                        }
-                        else {
-                            lobby.joinLobby(this.player);
-                            break;
                         }
                         break;
                     }
