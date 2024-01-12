@@ -62,7 +62,9 @@ public class GameManager implements Runnable {
                                 if (this.setStartBet(player, Integer.parseInt(diceValue), Integer.parseInt(diceNumber))) {
                                     break;
                                 }
+                            }
 
+                            if(currentBet != null){
                                 this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.toString());
                             }
                         }
@@ -238,25 +240,21 @@ public class GameManager implements Runnable {
 
     public boolean doubt(Player player) {
         boolean value = false;
-        int diceCount = 0;
-        Iterator var4 = this.lobby.getPlayers().iterator();
+        int diceCount = 1;
 
         label31:
-        while(var4.hasNext()) {
-            Player p = (Player)var4.next();
-            Iterator var6 = p.getDices().iterator();
+        for(Player p: lobby.getPlayers()) {
 
-            while(true) {
-                Dice dice;
-                do {
-                    if (!var6.hasNext()) {
-                        continue label31;
-                    }
+            for(Dice dice : p.getDices()) {
+                if(p.getDices().size() == diceCount){
 
-                    dice = (Dice)var6.next();
-                } while(dice.getValue() != this.currentBet.getDiceValue() && !dice.toString().equals("J"));
+                    this.lobby.sendToAll(dice.toString());
+                }
+                else{
+                    this.lobby.sendToAll(dice.toString() + " | ");
+                }
 
-                ++diceCount;
+                diceCount++;
             }
         }
 
