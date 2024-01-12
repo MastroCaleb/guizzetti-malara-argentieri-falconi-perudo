@@ -24,7 +24,13 @@ public class PlayerConnectionHandler implements Runnable {
                     String message = inputStream.readUTF();
 
                     if (message.equals("canStart")) {
-                        this.lobby.setHasStarted(true);
+                        if(this.lobby.canStart()){
+                            this.lobby.setHasStarted(true);
+                        }
+                        else{
+                            this.player.sendToThis("Not enough players.");
+                            this.lobby.setHasStarted(false);
+                        }
                     }
                     else if (message.equals("cantStart")) {
                         this.lobby.setStartSent(false);

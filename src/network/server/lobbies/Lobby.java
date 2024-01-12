@@ -106,7 +106,7 @@ public class Lobby implements Runnable {
     }
 
     public boolean canStart() {
-        return this.getNumberOfPlayers() >= 2;
+        return this.getNumberOfPlayers() >= this.lobbySettings.getMinPlayers();
     }
 
     public boolean hasStarted() {
