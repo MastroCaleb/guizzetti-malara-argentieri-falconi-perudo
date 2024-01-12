@@ -35,6 +35,9 @@ public class Player {
         }
     }
 
+    public void removeAllDices() {
+        this.dices = new LinkedList<Dice>();
+    }
     public void removeDice() {
         this.dices.remove();
     }

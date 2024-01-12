@@ -43,7 +43,8 @@ public class Lobby implements Runnable {
 
                 if (this.hasStarted && this.gameManager == null) {
                     for(Player player : players){
-                        player.rollAll();
+                        player.removeAllDices();
+                        player.setupPlayer(this);
                     }
 
                     this.LOGGER.log(Level.INFO, "Game has started.");

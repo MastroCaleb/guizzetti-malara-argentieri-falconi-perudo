@@ -17,6 +17,7 @@ public class GameManager implements Runnable {
         this.lobby = lobby;
     }
 
+    @Override
     public void run() {
         this.playersAlive = this.lobby.getPlayers().size();
         this.lobby.sendToAll("Round " + this.round);
@@ -176,7 +177,8 @@ public class GameManager implements Runnable {
                         this.lobby.sendToAll("End of " + player.getName() + "'s turn.");
                         this.lobby.sendToAll("");
                     }
-                } catch (InterruptedException var7) {
+                }
+                catch (InterruptedException var7) {
                     System.out.println("GameManager encountered a problem. Closing.");
                 }
             }
