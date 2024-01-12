@@ -1,6 +1,7 @@
 package utils;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -37,6 +38,7 @@ public class Serializer {
     public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
         System.out.println(value);
         LinkedList<String> values = getValues(value, ';');
+        System.out.println(values);
 
         for(String s : values) {
             LinkedList<String> temp = getValues(s, ':');
@@ -66,26 +68,11 @@ public class Serializer {
     }
 
     private static LinkedList<String> getValues(String value, char divider) {
-        int dividers = countDividers(value, divider);
-        LinkedList<Integer> indexes = getDividersIndexes(value, divider);
-        LinkedList<String> values = new LinkedList<String>();
-
-        for(int i = 0; i < dividers; i++) {
-            if (i == 0 && dividers == 1) {
-                values.add(value.substring(0, (Integer)indexes.get(i)));
-                values.add(value.substring((Integer)indexes.get(i) + 1));
-            }
-            else if (i == 0) {
-                values.add(value.substring(0, (Integer)indexes.get(i)));
-            }
-            else if (i == dividers - 1) {
-                values.add(value.substring((Integer)indexes.get(i) + 1));
-            }
-            else {
-                values.add(value.substring((Integer)indexes.get(i) + 1, (Integer)indexes.get(i + 1)));
-            }
+        String[] arrSplit = value.split(";");
+        LinkedList<String> values = new LinkedList<>;
+        for (String s : arrSplit){
+            values.add(s);
         }
-
         return values;
     }
 
