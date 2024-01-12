@@ -41,7 +41,9 @@ public class NewPlayerHandler implements Runnable {
 
                     String code = Server.getRandomCode();
 
-                    LobbySettings lobbySettings = new LobbySettings(code, settings);
+                    LobbySettings lobbySettings = new LobbySettings();
+                    lobbySettings.read("lobbyCode:"+code+";"+settings);
+
                     Lobby lobby = new Lobby(this.player, lobbySettings);
 
                     player.sendToThis("The code for your lobby is: " + code);
@@ -57,16 +59,15 @@ public class NewPlayerHandler implements Runnable {
                     String code = createOrJoin.replace("joinLobby:", "");
                     Lobby lobby = Server.getLobbyFromCode(code);
 
-                    while(true){
-                        if (lobby == null) {
-                            System.out.println("No Lobby with this code was found.");
-                        }
-                        else if(lobby.isPublic()){
-                            lobby.joinLobby(this.player);
-                            break;
-                        }
-                        else if(!lobby.isPublic()){
-                            System.out.println("Lobby is not public so ask the password.");
+                    if (lobby == null) {
+                        System.out.println("No Lobby with this code was found.");
+                    }
+                    else if(lobby.isPublic()){
+                        lobby.joinLobby(this.player);
+                        break;
+                    }
+                    else if(!lobby.isPublic()){
+                        while(true) {
                             this.player.sendToThis("askForPassword");
 
                             String password = inputStream.readUTF();
@@ -76,7 +77,7 @@ public class NewPlayerHandler implements Runnable {
                                 lobby.joinLobby(this.player);
                                 break;
                             }
-                            else{
+                            else {
                                 this.player.sendToThis("Wrong password.");
                             }
                         }
@@ -92,6 +93,9 @@ public class NewPlayerHandler implements Runnable {
         catch (IOException var7) {
             Server.players.remove(player);
             LOGGER.log(Level.WARNING, player.getName() + " has disconnected from the server.");
+        }
+        catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }

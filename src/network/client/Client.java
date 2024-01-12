@@ -106,16 +106,22 @@ public class Client implements Runnable {
                             password = In.nextLine();
                             break;
                         }
-
-                        System.out.println();
-                        System.out.println("Not a choice.");
-                        System.out.println();
+                        else{
+                            System.out.println();
+                            System.out.println("Not a choice.");
+                            System.out.println();
+                        }
                     }
 
 
                     while(maxPlayers <= 1) {
                         System.out.println("Set MAX number of Players in the lobby: (Default is 6, minimum is 2)");
                         maxPlayers = In.nextInt();
+                    }
+
+                    while(minPlayers <= 1) {
+                        System.out.println("Set MIN number of Players in the lobby: (Default is 2, minimum is 2)");
+                        minPlayers = In.nextInt();
                     }
 
                     while(maxDices <= 0) {
@@ -145,7 +151,7 @@ public class Client implements Runnable {
                         }
                     }
 
-                    LobbySettingsPacket lobbySettingsPacket = new LobbySettingsPacket(isPublic, password, maxPlayers, maxDices, jollies);
+                    LobbySettingsPacket lobbySettingsPacket = new LobbySettingsPacket(isPublic, password, maxPlayers, minPlayers, maxDices, jollies);
 
                     clientMessageThread.stopWaiting();
 

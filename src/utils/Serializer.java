@@ -33,16 +33,15 @@ public class Serializer {
         return values.toString();
     }
 
-    //Apparently has huge bug where only 6 attributes will be deserialized.
+    //Apparently has huge bug
     public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
-
+        System.out.println(value);
         LinkedList<String> values = getValues(value, ';');
 
         for(String s : values) {
             LinkedList<String> temp = getValues(s, ':');
             setField(object, (String)temp.get(0), (String)temp.get(1));
         }
-
     }
 
     private static <T> void setField(T object, String fieldName, String value) throws NoSuchFieldException, IllegalAccessException {

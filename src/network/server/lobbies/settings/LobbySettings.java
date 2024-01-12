@@ -1,16 +1,24 @@
 package network.server.lobbies.settings;
 
+import network.packets.Packet;
 import network.packets.settings.LobbySettingsPacket;
 import utils.Serializer;
 import utils.interfaces.Serialized;
 
-public class LobbySettings implements Serialized {
+public class LobbySettings extends Packet {
     private String lobbyCode = "";
-    private String password = "";
     private boolean isPublic;
+    private String password = "";
     private int maxPlayers = 6;
+    private int minPlayers = 2;
     private int maxDices = 5;
     private boolean jollies;
+
+    public LobbySettings(){}
+
+    /*
+
+    These dont work.
 
     public LobbySettings(String lobbyCode, String settings) {
         try {
@@ -21,14 +29,16 @@ public class LobbySettings implements Serialized {
         }
     }
 
-    public LobbySettings(String lobbyCode, boolean isPublic, String password, int maxPlayers, int maxDices, boolean jollies) {
+    public LobbySettings(String lobbyCode, boolean isPublic, String password, int maxPlayers, int minPlayers, int maxDices, boolean jollies) {
         this.lobbyCode = lobbyCode;
         this.isPublic = isPublic;
         this.password = password;
         this.maxPlayers = maxPlayers;
+        this.minPlayers = minPlayers;
         this.maxDices = maxDices;
         this.jollies = jollies;
     }
+     */
 
     public String getLobbyCode() {
         return this.lobbyCode;
@@ -46,6 +56,10 @@ public class LobbySettings implements Serialized {
         return this.maxPlayers;
     }
 
+    public int getMinPlayers() {
+        return this.minPlayers;
+    }
+
     public int getMaxDices() {
         return this.maxDices;
     }
@@ -54,20 +68,27 @@ public class LobbySettings implements Serialized {
         return this.jollies;
     }
 
+    /*
     public void packetToObject(String lobbyCode, String settings) throws NoSuchFieldException, IllegalAccessException {
         LobbySettingsPacket packet = new LobbySettingsPacket();
         packet.read(settings);
 
-        LobbySettings lobbySettings = new LobbySettings(lobbyCode, packet.isPublic(), packet.getPassword(), packet.getMaxPlayers(), packet.getMaxDices(), packet.useJollies());
-        this.read(lobbySettings.toString());
-        System.out.println(lobbySettings.toString());
-    }
+        System.out.println(settings);
 
-    public String toString() {
-        return Serializer.serializeObject(this, this.getClass().getDeclaredFields());
-    }
+        LobbySettings lobbySettings = new LobbySettings(lobbyCode, packet.isPublic(), packet.getPassword(), packet.getMaxPlayers(), packet.getMinPlayers(), packet.getMaxDices(), packet.useJollies());
 
-    public void read(String value) throws NoSuchFieldException, IllegalAccessException {
-        Serializer.deserializeObject(this, value);
+        System.out.println(packet.getPassword());
+
+        this.lobbyCode = lobbyCode;
+        this.isPublic = lobbySettings.isPublic();
+        this.password = lobbySettings.getPassword();
+        this.maxPlayers = lobbySettings.getMaxPlayers();
+        this.minPlayers = lobbySettings.getMinPlayers();
+        this.maxDices = lobbySettings.getMaxDices();
+        this.jollies = lobbySettings.useJollies();
+
+        System.out.println(this.write());
     }
+     */
+
 }
