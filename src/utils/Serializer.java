@@ -33,6 +33,7 @@ public class Serializer {
         return values.toString();
     }
 
+    //Apparently has huge bug where only 6 attributes will be deserialized.
     public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
 
         LinkedList<String> values = getValues(value, ';');
