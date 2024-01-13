@@ -18,6 +18,7 @@ public class Client implements Runnable {
     public static volatile boolean canStartBet = false;
     public static volatile boolean canSendAction = false;
     public static volatile boolean canSendNewBet = false;
+    public static volatile boolean canSendSockIt = false;
     private static Logger LOGGER = Logger.getLogger("Client");
     private String ip;
     private int port;
@@ -183,70 +184,90 @@ public class Client implements Runnable {
                         outputStream.writeUTF("canStart");
                     }
                 }
-                else {
+                else if (canStartBet) {
+                    canStartBet = false;
 
-                    if (canStartBet) {
-                        canStartBet = false;
+                    System.out.println("Insert the dice value of the bet: ");
+                    int diceValue = In.nextInt();
+                    System.out.println("Insert the dice number of the bet: ");
+                    int diceNumber = In.nextInt();
 
-                        System.out.println("Insert the dice value of the bet: ");
-                        int diceValue = In.nextInt();
-                        System.out.println("Insert the dice number of the bet: ");
+                    clientMessageThread.stopWaiting();
+
+                    outputStream.writeUTF("startBet:" + "diceValue:" + diceValue + ";" + "diceNumber:" + diceNumber);
+                }
+                else if (canSendAction) {
+                    canSendAction = false;
+
+                    System.out.println("[--DOUBT OR BET--]");
+                    System.out.println();
+                    System.out.println("1. Doubt");
+                    System.out.println("2. Bet Again");
+
+                    String choice = In.nextLine();
+
+                    clientMessageThread.stopWaiting();
+
+                    if (choice.equals("1") || choice.equals("2")) {
+                        outputStream.writeUTF("action:" + choice);
+                    }
+                    else {
+                        outputStream.writeUTF("action:error");
+                    }
+                }
+                else if (canSendNewBet) {
+                    canSendNewBet = false;
+
+                    String choice = In.nextLine();
+                    if (choice.equals("1")) {
+                        System.out.println("Change dice value of the bet: ");
+                        String diceValue = In.nextLine();
+
+                        if(diceValue.equals("J")){
+                            diceValue = "1";
+                        }
+                        else{
+                            try{
+                                int diceV = Integer.parseInt(diceValue);
+                            }
+                            catch(NumberFormatException e){
+                                diceValue = "0";
+                            }
+                        }
+
+                        clientMessageThread.stopWaiting();
+
+                        outputStream.writeUTF("diceValue:" + diceValue);
+                    }
+                    else if (choice.equals("2")) {
+                        System.out.println("Change dice number of the bet: ");
                         int diceNumber = In.nextInt();
 
                         clientMessageThread.stopWaiting();
 
-                        outputStream.writeUTF("startBet:" + "diceValue:" + diceValue + ";" + "diceNumber:" + diceNumber);
+                        outputStream.writeUTF("diceNumber:" + diceNumber);
                     }
-                    else if (canSendAction) {
-                        canSendAction = false;
+                }
+                else if(canSendSockIt){
+                    canSendSockIt = false;
 
-                        System.out.println("[--DOUBT OR BET--]");
-                        System.out.println();
-                        System.out.println("1. Doubt");
-                        System.out.println("2. Bet Again");
+                    System.out.println("[--CALL SOCK IT--]");
+                    System.out.println("Calling Sock It checks if the last bet is PERFECT.");
+                    System.out.println("If it is you get a dice (WIN).");
+                    System.out.println("If it's not you lose a dice (LOSE).");
+                    System.out.println();
+                    System.out.println("1. Sock It");
+                    System.out.println("2. No");
 
-                        String choice = In.nextLine();
+                    String choice = In.nextLine();
 
-                        clientMessageThread.stopWaiting();
+                    clientMessageThread.stopWaiting();
 
-                        if (choice.equals("1") || choice.equals("2")) {
-                            outputStream.writeUTF("action:" + choice);
-                        }
-                        else {
-                            outputStream.writeUTF("action:error");
-                        }
-                    } else if (canSendNewBet) {
-                        canSendNewBet = false;
-
-                        String choice = In.nextLine();
-                        if (choice.equals("1")) {
-                            System.out.println("Change dice value of the bet: ");
-                            String diceValue = In.nextLine();
-
-                            if(diceValue.equals("J")){
-                                diceValue = "1";
-                            }
-                            else{
-                                try{
-                                    int diceV = Integer.parseInt(diceValue);
-                                }
-                                catch(NumberFormatException e){
-                                    diceValue = "0";
-                                }
-                            }
-
-                            clientMessageThread.stopWaiting();
-
-                            outputStream.writeUTF("diceValue:" + diceValue);
-                        }
-                        else if (choice.equals("2")) {
-                            System.out.println("Change dice number of the bet: ");
-                            int diceNumber = In.nextInt();
-
-                            clientMessageThread.stopWaiting();
-
-                            outputStream.writeUTF("diceNumber:" + diceNumber);
-                        }
+                    if (choice.equals("1")) {
+                        outputStream.writeUTF("sockIt:Y");
+                    }
+                    else {
+                        outputStream.writeUTF("sockIt:N");
                     }
                 }
             }

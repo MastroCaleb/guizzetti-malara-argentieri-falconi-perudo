@@ -54,6 +54,10 @@ public class ClientMessageThread implements Runnable {
                         Client.canSendNewBet = true;
                         this.startWaiting();
                     }
+                    case "askForSockIt"  -> {
+                        Client.canSendSockIt = true;
+                        this.startWaiting();
+                    }
                     default -> {System.out.println(message);}
                 }
             }

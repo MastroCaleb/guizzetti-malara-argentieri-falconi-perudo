@@ -4,20 +4,26 @@ import game.bet.Bet;
 import game.dices.Dice;
 import game.player.Player;
 import network.server.lobbies.Lobby;
+import network.server.service.SockItHandler;
 
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.LinkedList;
 
 public class GameManager implements Runnable {
+
+    private LinkedList<Player> allPlayers = new LinkedList<Player>();
     private Bet currentBet = null;
     private int round = 1;
     private Lobby lobby;
     private int playersAlive = 0;
     private boolean hasFinished = false;
+    //PALIFIC
     private boolean palific = false;
     private int palificRound = 0;
-    private LinkedList<Player> allPlayers = new LinkedList<Player>();
+    //SOCK IT
+    private Player sockItUser = null;
+    private boolean sockIt = false;
 
     public GameManager(Lobby lobby) {
         this.lobby = lobby;
@@ -36,7 +42,6 @@ public class GameManager implements Runnable {
                 Player player = lobby.getPlayers().get(i);
                 try {
                     if (player.hasDices()) {
-
                         if (this.playersAlive == 1 || this.lobby.getPlayers().size() == 1) {
                             this.lobby.sendToAll("[--GAME HAS ENDED--]");
                             this.lobby.sendToAll("");
@@ -60,9 +65,14 @@ public class GameManager implements Runnable {
                             return;
                         }
 
-                        this.lobby.sendToAll("Turn of " + player.getName() + ", they have " + player.getDices().size() + " dices left.");
 
-                        player.sendToThis(player.getName() + ": " + player.getStringDices());
+
+                        this.lobby.sendToAll("Turn of " + player.getName() + ", they have " + player.getDices().size() + " dices left.");
+                        this.lobby.sendToAll("");
+
+                        player.sendToThis("[--YOUR TURN--]");
+                        player.sendToThis(player.getName() + "'s Dices: " + player.getStringDices());
+                        player.sendToThis("");
 
                         if (this.currentBet == null) {
                             while(!this.lobby.getPlayers().isEmpty()) {
@@ -98,9 +108,29 @@ public class GameManager implements Runnable {
                             while(!this.lobby.getPlayers().isEmpty()) {
                                 player.sendToThis("askAction");
 
+                                LinkedList<Thread> handlers = new LinkedList<Thread>();
+
+                                for(Player p : lobby.getPlayers()){
+                                    if(!p.equals(player)){
+                                        Thread sockItHandler = new Thread(new SockItHandler(p, this));
+                                        sockItHandler.start();
+                                        handlers.add(sockItHandler);
+                                    }
+                                }
+
                                 this.startWaiting();
 
                                 String choice = player.getPlayerInteraction();
+
+                                if(!sockIt){
+                                    for(Thread thread : handlers){
+                                        thread.stop();
+                                    }
+                                }
+                                else {
+                                    player.sendToThis("Someone called Sock It, so your bet was skipped.");
+                                    break;
+                                }
 
                                 if (choice == null) {
                                     break;
@@ -163,26 +193,11 @@ public class GameManager implements Runnable {
                                                 palific = true;
                                                 palificRound = round;
                                             }
-                                            i--;
+                                            i = lobby.getPlayers().indexOf(this.currentBet.getPlayer());
                                         }
                                     }
 
-                                    this.currentBet = null;
-                                    this.lobby.sendToAll("");
-                                    this.lobby.sendToAll("RE-ROLLING ALL PLAYER'S DICES");
-                                    this.lobby.sendToAll("");
-
-                                    for(Player p : lobby.getPlayers()){
-                                        p.rollAll();
-                                    }
-
-                                    if(palific && palificRound!=round){
-                                        palific = false;
-                                    }
-
-                                    this.round++;
-
-                                    this.lobby.sendToAll("Round " + this.round);
+                                    this.nextRound();
 
                                     break;
                                 }
@@ -199,10 +214,6 @@ public class GameManager implements Runnable {
 
                                         String newBet = player.getPlayerInteraction();
 
-                                        if (newBet == null) {
-                                            break;
-                                        }
-
                                         if (newBet.contains("diceValue:")) {
                                             if (this.setNewDiceValue(player, Integer.parseInt(newBet.replace("diceValue:", "")))) {
                                                 this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.toString());
@@ -216,6 +227,46 @@ public class GameManager implements Runnable {
                                             }
                                         }
                                     }
+
+                                    if(sockIt && sockItUser !=  null){
+                                        this.lobby.sendToAll("");
+                                        this.lobby.sendToAll("[--SOCK IT--]");
+                                        this.lobby.sendToAll(sockItUser.getName() + " called a SOCK IT!");
+                                        this.lobby.sendToAll("");
+
+                                        boolean result = sockIt();
+
+                                        if(!result){
+                                            this.lobby.sendToAll("Sock It Lost. " + player.getName() + " lost a dice.");
+
+                                            player.removeDice();
+
+                                            if (!player.hasDices()) {
+                                                this.lobby.sendToAll("");
+                                                this.lobby.sendToAll(player.getName() + " lost the game.");
+                                                this.playersAlive--;
+                                            }
+                                            else{
+                                                this.lobby.sendToAll("");
+                                                this.lobby.sendToAll("As " + player.getName() + " lost a dice, they start the next round.");
+                                                if(player.getDices().size() == 1){
+                                                    this.lobby.sendToAll("");
+                                                    this.lobby.sendToAll(player.getName() + " is PALIFIC!");
+                                                    palific = true;
+                                                    palificRound = round;
+                                                }
+                                                i--;
+                                            }
+                                        }
+                                        else{
+                                            this.lobby.sendToAll("Sock It Won! " + player.getName() + " gained a dice!");
+
+                                            player.addDice(lobby.getSettings().useJollies());
+                                        }
+
+                                        this.nextRound();
+                                    }
+
                                     break;
                                 }
 
@@ -228,7 +279,7 @@ public class GameManager implements Runnable {
                         this.lobby.sendToAll("");
                     }
                 }
-                catch(SocketException e){
+                catch(IOException e){
                     this.lobby.leaveLobby(player);
                 }
                 catch (InterruptedException e) {
@@ -240,6 +291,10 @@ public class GameManager implements Runnable {
 
     public boolean hasFinished() {
         return this.hasFinished;
+    }
+
+    public Lobby getLobby() {
+        return lobby;
     }
 
     public void startWaiting() throws InterruptedException {
@@ -254,7 +309,7 @@ public class GameManager implements Runnable {
         }
     }
 
-    public boolean setStartBet(Player player, int diceValue, int diceNumber) {
+    public boolean setStartBet(Player player, int diceValue, int diceNumber) throws IOException {
         if (diceValue >= 2 && diceValue <= 6) {
             if (diceNumber <= 0) {
                 player.sendToThis("Not a viable dice number, must be greater than 0.");
@@ -271,7 +326,7 @@ public class GameManager implements Runnable {
         }
     }
 
-    public boolean setNewDiceValue(Player player, int newDiceValue) {
+    public boolean setNewDiceValue(Player player, int newDiceValue) throws IOException {
         int minDiceValue = minDiceValue();
         if (newDiceValue >= minDiceValue && newDiceValue <= 6 && ((this.lobby.getSettings().useJollies() && newDiceValue == 1) || newDiceValue > this.currentBet.getDiceValue()) && !palific) {
             this.currentBet = new Bet(player, newDiceValue, this.currentBet.getDiceNumber());
@@ -288,9 +343,10 @@ public class GameManager implements Runnable {
         }
     }
 
-    public boolean setNewDiceNumber(Player player, int newDiceNumber) {
-        if (newDiceNumber <= this.currentBet.getDiceNumber()) {
-            player.sendToThis("Not a viable value, must be  bigger than the current bet's dice number (" + this.currentBet.getDiceNumber() + ")");
+    public boolean setNewDiceNumber(Player player, int newDiceNumber) throws IOException {
+        int min = newDiceNumber == 1 ? this.currentBet.getDiceNumber()/2 : this.currentBet.getDiceNumber();
+        if (newDiceNumber <= min) {
+            player.sendToThis("Not a viable value, must be  bigger than the current bet's dice number (" + min + ")");
             return false;
         } else {
             this.currentBet = new Bet(player, this.currentBet.getDiceValue(), newDiceNumber);
@@ -298,7 +354,7 @@ public class GameManager implements Runnable {
         }
     }
 
-    public boolean doubt() throws SocketException{
+    public boolean doubt(){
         boolean value = false;
 
         int diceCount = countDices();
@@ -306,6 +362,22 @@ public class GameManager implements Runnable {
         showPlayerDices();
 
         if (this.currentBet.getDiceNumber() > diceCount) {
+            value = true;
+        }
+
+        this.lobby.sendToAll("");
+        this.lobby.sendToAll("Dices with value (" + this.currentBet.getDiceValue() + ") found: " + diceCount);
+        this.lobby.sendToAll("");
+        return value;
+    }
+    public boolean sockIt(){
+        boolean value = false;
+
+        int diceCount = countDices();
+
+        showPlayerDices();
+
+        if (this.currentBet.getDiceNumber() == diceCount) {
             value = true;
         }
 
@@ -334,6 +406,13 @@ public class GameManager implements Runnable {
         }
     }
 
+    public void setSockIt(Player player) {
+        if(!sockIt){
+            sockItUser = player;
+            sockIt = true;
+        }
+    }
+
     public int minDiceValue(){
         if(this.lobby.getSettings().useJollies() && !palific){
             return 1;
@@ -341,5 +420,24 @@ public class GameManager implements Runnable {
         else{
             return 2;
         }
+    }
+
+    public void nextRound(){
+        this.currentBet = null;
+        this.lobby.sendToAll("");
+        this.lobby.sendToAll("RE-ROLLING ALL PLAYER'S DICES");
+        this.lobby.sendToAll("");
+
+        for(Player p : lobby.getPlayers()){
+            p.rollAll();
+        }
+
+        if(palific && palificRound!=round){
+            palific = false;
+        }
+
+        this.round++;
+
+        this.lobby.sendToAll("Round " + this.round);
     }
 }

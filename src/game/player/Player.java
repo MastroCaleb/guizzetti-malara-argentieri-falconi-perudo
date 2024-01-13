@@ -18,13 +18,6 @@ public class Player {
         this.name = name;
         this.client = client;
     }
-
-    public void setupPlayer(Lobby lobby) {
-        for(int i = 0; i < lobby.getSettings().getMaxDices(); ++i) {
-            this.dices.add(new Dice(lobby.getSettings().useJollies()));
-        }
-    }
-
     public boolean hasDices() {
         return !this.dices.isEmpty();
     }
@@ -41,6 +34,12 @@ public class Player {
     public void removeDice() {
         this.dices.remove();
     }
+    public void setupPlayer(Lobby lobby) {
+        for(int i = 0; i < lobby.getSettings().getMaxDices(); ++i) {
+            this.dices.add(new Dice(lobby.getSettings().useJollies()));
+        }
+    }
+    public void addDice(boolean jollies) {this.dices.add(new Dice(jollies));}
 
     public LinkedList<Dice> getDices() {
         return this.dices;
@@ -79,13 +78,8 @@ public class Player {
         this.playerInteraction = playerInteraction;
     }
 
-    public void sendToThis(String message) {
-        try {
-            DataOutputStream outputStream = new DataOutputStream(this.client.getOutputStream());
-            outputStream.writeUTF(message);
-        }
-        catch (IOException var3) {
-            throw new RuntimeException(var3);
-        }
+    public void sendToThis(String message) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(this.client.getOutputStream());
+        outputStream.writeUTF(message);
     }
 }

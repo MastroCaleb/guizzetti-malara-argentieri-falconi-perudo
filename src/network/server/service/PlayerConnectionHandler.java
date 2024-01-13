@@ -56,6 +56,10 @@ public class PlayerConnectionHandler implements Runnable {
                         this.player.setPlayerInteraction(message.replace("action:", ""));
                         this.lobby.getGameManager().stopWaiting();
                     }
+
+                    if (message.contains("sockIt:")){
+                        this.player.setPlayerInteraction(message);
+                    }
                 }
                 catch (SocketException e) {
                     break;
