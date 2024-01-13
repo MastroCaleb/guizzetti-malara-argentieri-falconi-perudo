@@ -36,31 +36,7 @@ public class Server implements Runnable {
                 DataInputStream inputStream = new DataInputStream(client.getInputStream());
 
                 Player player = new Player("Unnamed", client);
-                try{
-
-                    String name = "Unnamed";
-                    while (true) {
-                        player.sendToThis("askNickName");
-
-                        name = inputStream.readUTF();
-
-                        if (!nickIsUsed(name)) {
-                            player = new Player(name, client);
-                            break;
-                        } else {
-                            player.sendToThis("Nickname not available.");
-                        }
-                    }
-
-                    this.LOGGER.log(Level.INFO, name + " has connected to the server.");
-
-                    players.add(player);
-
-                    (new Thread(new NewPlayerHandler(player))).start();
-                }
-                catch(SocketException e){
-                    players.remove(player);
-                }
+                (new Thread(new NewPlayerHandler(player))).start();
             }
         }
 

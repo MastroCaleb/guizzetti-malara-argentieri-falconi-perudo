@@ -5,6 +5,9 @@ import game.dices.Dice;
 import game.player.Player;
 import network.server.lobbies.Lobby;
 
+import java.io.IOException;
+import java.net.SocketException;
+
 public class GameManager implements Runnable {
     private Bet currentBet = null;
     private int round = 1;
@@ -55,7 +58,7 @@ public class GameManager implements Runnable {
                         player.sendToThis(player.getName() + ": " + player.getStringDices());
 
                         if (this.currentBet == null) {
-                            while(true) {
+                            while(!this.lobby.getPlayers().isEmpty()) {
                                 player.sendToThis("[--START BET--]");
                                 player.sendToThis("");
                                 player.sendToThis("askStartBet");
@@ -85,7 +88,7 @@ public class GameManager implements Runnable {
                         else {
                             this.lobby.sendToAll("Current Bet: " + this.currentBet.toString());
 
-                            while(true) {
+                            while(!this.lobby.getPlayers().isEmpty()) {
                                 player.sendToThis("askAction");
 
                                 this.startWaiting();
@@ -177,7 +180,7 @@ public class GameManager implements Runnable {
                                     break;
                                 }
                                 else if (choice.equals("2")) {
-                                    while(true) {
+                                    while(!this.lobby.getPlayers().isEmpty()) {
                                         player.sendToThis("[--NEW BET--]");
                                         player.sendToThis("");
                                         player.sendToThis("1. Change Dice Value (Currently: " + this.currentBet.getDiceValue() + ")");
@@ -218,7 +221,10 @@ public class GameManager implements Runnable {
                         this.lobby.sendToAll("");
                     }
                 }
-                catch (InterruptedException var7) {
+                catch(SocketException e){
+                    this.lobby.leaveLobby(player);
+                }
+                catch (InterruptedException e) {
                     System.out.println("GameManager encountered a problem. Closing.");
                 }
             }
@@ -285,7 +291,7 @@ public class GameManager implements Runnable {
         }
     }
 
-    public boolean doubt() {
+    public boolean doubt() throws SocketException{
         boolean value = false;
 
         int diceCount = countDices();
@@ -306,7 +312,7 @@ public class GameManager implements Runnable {
         int diceCount = 0;
         for(Player p: lobby.getPlayers()) {
             for(Dice dice : p.getDices()) {
-                if(dice.getValue() == this.currentBet.getDiceValue() || dice.getValue() == 1){
+                if(dice.getValue() == this.currentBet.getDiceValue() || (!palific && dice.getValue() == 1)){
                     diceCount++;
                 }
             }
@@ -314,7 +320,7 @@ public class GameManager implements Runnable {
         return diceCount;
     }
 
-    public void showPlayerDices(){
+    public void showPlayerDices() {
         for(Player player : lobby.getPlayers()){
             this.lobby.sendToAll(player.getName() + ": " + player.getStringDices());
             this.lobby.sendToAll("");

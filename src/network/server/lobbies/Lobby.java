@@ -81,21 +81,25 @@ public class Lobby implements Runnable {
         this.isWaiting = true;
     }
 
-    public void leaveLobby(Player player) throws IOException {
-        player.getClient().close();
-        this.players.remove(player);
-        if (player.equals(this.host) && !this.players.isEmpty()) {
-            this.host = (Player)this.players.getFirst();
-            this.startSent = false;
-        }
+    public void leaveLobby(Player player) {
+        try{
+            player.getClient().close();
+            this.players.remove(player);
+            if (player.equals(this.host) && !this.players.isEmpty()) {
+                this.host = (Player)this.players.getFirst();
+                this.startSent = false;
+            }
 
-        Server.players.remove(player);
-        this.sendToAll(player.getName() + " left the lobby.");
-        if (this.gameManager != null) {
-            this.gameManager.stopWaiting();
-        }
+            Server.players.remove(player);
+            this.sendToAll(player.getName() + " left the lobby.");
+            if (this.gameManager != null) {
+                this.gameManager.stopWaiting();
+            }
 
-        this.isWaiting = true;
+            this.isWaiting = true;
+        }
+        catch(IOException e){
+        }
     }
 
     public int getNumberOfPlayers() {
@@ -150,14 +154,17 @@ public class Lobby implements Runnable {
     }
 
     public void sendToAll(String message) {
+        Player temp = null;
         if (!this.players.isEmpty()) {
             try {
                 for(Player player : players) {
+                    temp = player;
                     DataOutputStream outputStream = new DataOutputStream(player.getClient().getOutputStream());
                     outputStream.writeUTF(message);
                 }
             }
             catch (IOException e) {
+                leaveLobby(temp);
             }
         }
     }

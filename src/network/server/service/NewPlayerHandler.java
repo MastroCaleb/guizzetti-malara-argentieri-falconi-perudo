@@ -3,6 +3,7 @@ package network.server.service;
 import game.player.Player;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import network.server.Server;
@@ -22,6 +23,25 @@ public class NewPlayerHandler implements Runnable {
         try {
             while(true) {
                 DataInputStream inputStream = new DataInputStream(this.player.getClient().getInputStream());
+
+                while (this.player.getName().equals("Unnamed")) {
+                    player.sendToThis("askNickName");
+
+                    String name = inputStream.readUTF();
+
+                    if (!Server.nickIsUsed(name)) {
+                        player = new Player(name, player.getClient());
+                        break;
+                    }
+                    else {
+                        player.sendToThis("Nickname not available.");
+                    }
+                }
+
+                this.LOGGER.log(Level.INFO, player.getName() + " has connected to the server.");
+
+                Server.players.add(player);
+
 
                 this.player.sendToThis("");
                 this.player.sendToThis(Server.getLobbyList());
@@ -90,7 +110,7 @@ public class NewPlayerHandler implements Runnable {
                 }
             }
         }
-        catch (IOException var7) {
+        catch (IOException e) {
             Server.players.remove(player);
             LOGGER.log(Level.WARNING, player.getName() + " has disconnected from the server.");
         }
