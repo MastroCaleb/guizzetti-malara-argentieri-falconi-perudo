@@ -221,11 +221,23 @@ public class Client implements Runnable {
                         String choice = In.nextLine();
                         if (choice.equals("1")) {
                             System.out.println("Change dice value of the bet: ");
-                            int diceNumber = In.nextInt();
+                            String diceValue = In.nextLine();
+
+                            if(diceValue.equals("J")){
+                                diceValue = "1";
+                            }
+                            else{
+                                try{
+                                    int diceV = Integer.parseInt(diceValue);
+                                }
+                                catch(NumberFormatException e){
+                                    diceValue = "0";
+                                }
+                            }
 
                             clientMessageThread.stopWaiting();
 
-                            outputStream.writeUTF("diceValue:" + diceNumber);
+                            outputStream.writeUTF("diceValue:" + diceValue);
                         }
                         else if (choice.equals("2")) {
                             System.out.println("Change dice number of the bet: ");

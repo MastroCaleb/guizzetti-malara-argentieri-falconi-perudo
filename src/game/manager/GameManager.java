@@ -3,7 +3,6 @@ package game.manager;
 import game.bet.Bet;
 import game.dices.Dice;
 import game.player.Player;
-import java.util.Iterator;
 import network.server.lobbies.Lobby;
 
 public class GameManager implements Runnable {
@@ -12,6 +11,8 @@ public class GameManager implements Runnable {
     private Lobby lobby;
     private int playersAlive = 0;
     private boolean hasFinished = false;
+    private boolean palific = false;
+    private int palificRound = 0;
 
     public GameManager(Lobby lobby) {
         this.lobby = lobby;
@@ -124,6 +125,12 @@ public class GameManager implements Runnable {
                                         else{
                                             this.lobby.sendToAll("");
                                             this.lobby.sendToAll("As " + player.getName() + " lost a dice, they start the next round.");
+                                            if(player.getDices().size() == 1){
+                                                this.lobby.sendToAll("");
+                                                this.lobby.sendToAll(player.getName() + " is PALIFIC!");
+                                                palific = true;
+                                                palificRound = round;
+                                            }
                                             i--;
                                         }
                                     }
@@ -140,6 +147,12 @@ public class GameManager implements Runnable {
                                         else{
                                             this.lobby.sendToAll("");
                                             this.lobby.sendToAll("As " + this.currentBet.getPlayer().getName() + " lost a dice, they start the next round.");
+                                            if(this.currentBet.getPlayer().getDices().size() == 1){
+                                                this.lobby.sendToAll("");
+                                                this.lobby.sendToAll(this.currentBet.getPlayer().getName() + " is PALIFIC!");
+                                                palific = true;
+                                                palificRound = round;
+                                            }
                                             i--;
                                         }
                                     }
@@ -151,6 +164,10 @@ public class GameManager implements Runnable {
 
                                     for(Player p : lobby.getPlayers()){
                                         p.rollAll();
+                                    }
+
+                                    if(palific && palificRound!=round){
+                                        palific = false;
                                     }
 
                                     this.round++;
@@ -229,22 +246,31 @@ public class GameManager implements Runnable {
             if (diceNumber <= 0) {
                 player.sendToThis("Not a viable dice number, must be greater than 0.");
                 return false;
-            } else {
+            }
+            else {
                 this.currentBet = new Bet(player, diceValue, diceNumber);
                 return true;
             }
-        } else {
+        }
+        else {
             player.sendToThis("Not a viable dice value, must be greater than 2 and lower than 6.");
             return false;
         }
     }
 
     public boolean setNewDiceValue(Player player, int newDiceValue) {
-        if (newDiceValue >= 2 && newDiceValue <= 6 && newDiceValue > this.currentBet.getDiceValue()) {
+        int minDiceValue = minDiceValue();
+        if (newDiceValue >= minDiceValue && newDiceValue <= 6 && ((this.lobby.getSettings().useJollies() && newDiceValue == 1) || newDiceValue > this.currentBet.getDiceValue()) && !palific) {
             this.currentBet = new Bet(player, newDiceValue, this.currentBet.getDiceNumber());
             return true;
-        } else {
-            player.sendToThis("Not a viable value, must be greater than 2 and lower than 6. It also must be bigger than the current bet's dice value (" + this.currentBet.getDiceValue() + ").");
+        }
+        else {
+            if(palific){
+                player.sendToThis("Cannot change the dice value when there's a PALIFIC player.");
+            }
+            else{
+                player.sendToThis("Not a viable value, must be greater than 2 and lower than 6. It also must be bigger than the current bet's dice value (" + this.currentBet.diceValueString() + ").");
+            }
             return false;
         }
     }
@@ -292,6 +318,15 @@ public class GameManager implements Runnable {
         for(Player player : lobby.getPlayers()){
             this.lobby.sendToAll(player.getName() + ": " + player.getStringDices());
             this.lobby.sendToAll("");
+        }
+    }
+
+    public int minDiceValue(){
+        if(this.lobby.getSettings().useJollies() && !palific){
+            return 1;
+        }
+        else{
+            return 2;
         }
     }
 }

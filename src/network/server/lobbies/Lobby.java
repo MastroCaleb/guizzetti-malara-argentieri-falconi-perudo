@@ -162,6 +162,21 @@ public class Lobby implements Runnable {
         }
     }
 
+    public void sendToAllExcept(Player player, String message) {
+        if (!this.players.isEmpty()) {
+            try {
+                for(Player p : players) {
+                    if(!p.equals(player)){
+                        DataOutputStream outputStream = new DataOutputStream(p.getClient().getOutputStream());
+                        outputStream.writeUTF(message);
+                    }
+                }
+            }
+            catch (IOException e) {
+            }
+        }
+    }
+
     public String playerCount() {
         return "(" + this.players.size() + "/" + this.lobbySettings.getMaxPlayers() + ")";
     }

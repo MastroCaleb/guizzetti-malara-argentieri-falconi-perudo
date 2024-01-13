@@ -28,11 +28,15 @@ public class Bet {
         return this.diceValue;
     }
 
+    public String diceValueString() {
+        return this.diceValue == 1 ? "J" : "" + this.diceValue;
+    }
+
     public int getDiceNumber() {
         return this.diceNumber;
     }
 
     public String toString() {
-        return "(Dice Value: " + this.diceValue + " | Betted Number: " + this.diceNumber + ")";
+        return "(Dice Value: " + this.diceValueString() + " | Betted Number: " + this.diceNumber + ")";
     }
 }
