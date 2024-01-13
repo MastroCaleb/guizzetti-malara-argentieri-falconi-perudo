@@ -101,7 +101,7 @@ public class GameManager implements Runnable {
                                     this.lobby.sendToAll(player.getName() + " made a Doubt!");
                                     this.lobby.sendToAll(player.getName() + " doubts that there are " + this.currentBet.getDiceNumber() + " dices of value " + this.currentBet.getDiceValue() + ".");
 
-                                    boolean doubt = this.doubt(player);
+                                    boolean doubt = this.doubt();
 
                                     this.lobby.sendToAll("");
 
@@ -259,7 +259,7 @@ public class GameManager implements Runnable {
         }
     }
 
-    public boolean doubt(Player player) {
+    public boolean doubt() {
         boolean value = false;
 
         int diceCount = countDices();
