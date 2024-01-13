@@ -1,6 +1,6 @@
-package game.bet;
+package network.game.bet;
 
-import game.player.Player;
+import network.game.player.Player;
 import network.packets.bet.BetPacket;
 
 public class Bet {

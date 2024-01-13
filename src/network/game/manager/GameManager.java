@@ -1,13 +1,12 @@
-package game.manager;
+package network.game.manager;
 
-import game.bet.Bet;
-import game.dices.Dice;
-import game.player.Player;
+import network.game.bet.Bet;
+import network.game.dices.Dice;
+import network.game.player.Player;
 import network.server.lobbies.Lobby;
 import network.server.service.SockItHandler;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.LinkedList;
 
 public class GameManager implements Runnable {
@@ -45,7 +44,7 @@ public class GameManager implements Runnable {
                         if (this.playersAlive == 1 || this.lobby.getPlayers().size() == 1) {
                             this.lobby.sendToAll("[--GAME HAS ENDED--]");
                             this.lobby.sendToAll("");
-                            this.lobby.sendToAll(player.getName() + " won the game!");
+                            this.lobby.sendToAll(player.getName() + " won the network.game!");
                             this.lobby.sendToAll("");
 
                             for(Player p : allPlayers){
@@ -110,11 +109,13 @@ public class GameManager implements Runnable {
 
                                 LinkedList<Thread> handlers = new LinkedList<Thread>();
 
-                                for(Player p : lobby.getPlayers()){
-                                    if(!p.equals(player)){
-                                        Thread sockItHandler = new Thread(new SockItHandler(p, this));
-                                        sockItHandler.start();
-                                        handlers.add(sockItHandler);
+                                if(lobby.getSettings().canSockIt()){
+                                    for(Player p : lobby.getPlayers()){
+                                        if(!p.equals(player)){
+                                            Thread sockItHandler = new Thread(new SockItHandler(p, this));
+                                            sockItHandler.start();
+                                            handlers.add(sockItHandler);
+                                        }
                                     }
                                 }
 
@@ -122,15 +123,18 @@ public class GameManager implements Runnable {
 
                                 String choice = player.getPlayerInteraction();
 
-                                if(!sockIt){
-                                    for(Thread thread : handlers){
-                                        thread.stop();
+                                if(lobby.getSettings().canSockIt()){
+                                    if(!sockIt){
+                                        for(Thread thread : handlers){
+                                            thread.stop();
+                                        }
+                                    }
+                                    else {
+                                        player.sendToThis("Someone called Sock It, so your bet was skipped.");
+                                        break;
                                     }
                                 }
-                                else {
-                                    player.sendToThis("Someone called Sock It, so your bet was skipped.");
-                                    break;
-                                }
+
 
                                 if (choice == null) {
                                     break;
@@ -159,7 +163,7 @@ public class GameManager implements Runnable {
 
                                         if (!player.hasDices()) {
                                             this.lobby.sendToAll("");
-                                            this.lobby.sendToAll(player.getName() + " lost the game.");
+                                            this.lobby.sendToAll(player.getName() + " lost the network.game.");
                                             this.playersAlive--;
                                         }
                                         else{
@@ -181,7 +185,7 @@ public class GameManager implements Runnable {
 
                                         if (!this.currentBet.getPlayer().hasDices()) {
                                             this.lobby.sendToAll("");
-                                            this.lobby.sendToAll(this.currentBet.getPlayer().getName() + " lost the game.");
+                                            this.lobby.sendToAll(this.currentBet.getPlayer().getName() + " lost the network.game.");
                                             this.playersAlive--;
                                         }
                                         else{
@@ -243,7 +247,7 @@ public class GameManager implements Runnable {
 
                                             if (!player.hasDices()) {
                                                 this.lobby.sendToAll("");
-                                                this.lobby.sendToAll(player.getName() + " lost the game.");
+                                                this.lobby.sendToAll(player.getName() + " lost the network.game.");
                                                 this.playersAlive--;
                                             }
                                             else{

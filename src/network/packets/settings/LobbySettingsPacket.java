@@ -9,40 +9,19 @@ public class LobbySettingsPacket extends Packet {
     private int minPlayers = 2;
     private int maxDices = 5;
     private boolean jollies;
+    private boolean sockIt;
 
-    public LobbySettingsPacket() {
-    }
-
-    public LobbySettingsPacket(boolean isPublic, String password, int maxPlayers, int minPlayers, int maxDices, boolean jollies) {
+    public LobbySettingsPacket(boolean isPublic, String password, int maxPlayers, int minPlayers, int maxDices, boolean jollies, boolean sockIt) {
         this.isPublic = isPublic;
         this.password = password;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
         this.maxDices = maxDices;
         this.jollies = jollies;
+        this.sockIt = sockIt;
     }
 
     public boolean isPublic() {
         return this.isPublic;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public int getMaxPlayers() {
-        return this.maxPlayers;
-    }
-
-    public int getMinPlayers() {
-        return this.minPlayers;
-    }
-
-    public int getMaxDices() {
-        return this.maxDices;
-    }
-
-    public boolean useJollies() {
-        return this.jollies;
     }
 }

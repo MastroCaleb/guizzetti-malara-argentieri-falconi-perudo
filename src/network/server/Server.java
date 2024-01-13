@@ -1,12 +1,10 @@
 package network.server;
 
-import game.player.Player;
+import network.game.player.Player;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.logging.Level;

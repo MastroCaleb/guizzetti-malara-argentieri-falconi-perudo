@@ -1,6 +1,6 @@
 package network.server.service;
 
-import game.player.Player;
+import network.game.player.Player;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.SocketException;

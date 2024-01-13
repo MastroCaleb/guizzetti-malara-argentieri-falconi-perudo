@@ -1,10 +1,9 @@
-package game.player;
+package network.game.player;
 
-import game.dices.Dice;
+import network.game.dices.Dice;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Iterator;
 import java.util.LinkedList;
 import network.server.lobbies.Lobby;
 

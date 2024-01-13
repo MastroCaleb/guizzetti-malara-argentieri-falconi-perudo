@@ -1,7 +1,7 @@
 package network.server.lobbies;
 
-import game.manager.GameManager;
-import game.player.Player;
+import network.game.manager.GameManager;
+import network.game.player.Player;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;

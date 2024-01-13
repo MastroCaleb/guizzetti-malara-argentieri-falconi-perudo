@@ -23,6 +23,8 @@ public class Client implements Runnable {
     private String ip;
     private int port;
     private Socket client;
+    private DataOutputStream outputStream;
+    private ClientMessageThread clientMessageThread;
 
     public Client(String ip, int port) throws IOException {
         this.ip = ip;
@@ -33,247 +35,305 @@ public class Client implements Runnable {
     @Override
     public void run() {
         try {
-            DataOutputStream outputStream = new DataOutputStream(this.client.getOutputStream());
-            ClientMessageThread clientMessageThread = new ClientMessageThread(this.client);
+            outputStream = new DataOutputStream(this.client.getOutputStream());
+            clientMessageThread = new ClientMessageThread(this.client);
 
             (new Thread(clientMessageThread)).start();
 
             while(true) {
                 if(canSendNick){
-                    canSendNick = false;
-                    System.out.println("[--PROFILE--]");
-                    System.out.println("Insert your nickname: ");
-                    String name = In.nextLine();
-
-                    clientMessageThread.stopWaiting();
-
-                    outputStream.writeUTF(name);
+                    canSendNick();
                 }
                 else if (canCreateOrJoin) {
-                    canCreateOrJoin = false;
-                    System.out.println("[--CREATE OR JOIN--]");
-                    System.out.println();
-                    System.out.println("1. Create New Lobby");
-                    System.out.println("2. Join Lobby");
-                    System.out.println("3. Update Lobby List");
-
-                    String choice = In.nextLine();
-
-                    clientMessageThread.stopWaiting();
-
-                    if (choice.equals("1")) {
-
-                        outputStream.writeUTF("createLobby");
-                    }
-                    else if (choice.equals("2")) {
-                        System.out.println();
-                        System.out.println("Type the code of the lobby you want to join: ");
-
-                        String code = In.nextLine();
-
-                        outputStream.writeUTF("joinLobby:" + code);
-                    }
-                    else if (choice.equals("3")){
-                        outputStream.writeUTF("updateLobby");
-                    }
+                    canCreateOrJoin();
                 }
                 else if (canSendLobbySettings) {
-                    canSendLobbySettings = false;
-
-                    boolean isPublic;
-                    String password = "";
-                    int maxPlayers = 1;
-                    int minPlayers = 0;
-                    int maxDices = 0;
-                    boolean jollies;
-
-                    System.out.println("[--LOBBY SETTINGS--]");
-                    System.out.println();
-
-                    while(true) {
-                        System.out.println("Lobby type:");
-                        System.out.println("1. Public");
-                        System.out.println("2. Private");
-
-                        String choice = In.nextLine();
-
-                        if (choice.equals("1")) {
-                            isPublic = true;
-                            break;
-                        }
-                        else if (choice.equals("2")) {
-                            isPublic = false;
-                            System.out.println("Type in the password for the lobby:");
-                            password = In.nextLine();
-                            break;
-                        }
-                        else{
-                            System.out.println();
-                            System.out.println("Not a choice.");
-                            System.out.println();
-                        }
-                    }
-
-
-                    while(maxPlayers <= 1) {
-                        System.out.println("Set MAX number of Players in the lobby: (Default is 6, minimum is 2)");
-                        maxPlayers = In.nextInt();
-                    }
-
-                    while(minPlayers <= 1) {
-                        System.out.println("Set MIN number of Players in the lobby: (Default is 2, minimum is 2)");
-                        minPlayers = In.nextInt();
-                    }
-
-                    while(maxDices <= 0) {
-                        System.out.println("Set MAX number of dices for each Player in the lobby: (Default is 5, minimum is 1)");
-                        maxDices = In.nextInt();
-                    }
-
-                    while(true) {
-                        System.out.println("Allow Jollies?");
-                        System.out.println("1. Yes");
-                        System.out.println("2. No");
-
-                        String choice = In.nextLine();
-
-                        if (choice.equals("1")) {
-                            jollies = true;
-                            break;
-                        }
-                        else if (choice.equals("2")) {
-                            jollies = false;
-                            break;
-                        }
-                        else{
-                            System.out.println();
-                            System.out.println("Not a choice.");
-                            System.out.println();
-                        }
-                    }
-
-                    LobbySettingsPacket lobbySettingsPacket = new LobbySettingsPacket(isPublic, password, maxPlayers, minPlayers, maxDices, jollies);
-
-                    clientMessageThread.stopWaiting();
-
-                    outputStream.writeUTF(lobbySettingsPacket.write());
-
+                    canSendLobbySettings();
                 }
                 else if (canSendPassword) {
-                    canSendPassword = false;
-
-                    System.out.println("Enter the password: ");
-                    String password = In.nextLine();
-
-                    clientMessageThread.stopWaiting();
-
-                    outputStream.writeUTF(password);
+                    canSendPassword();
                 }
                 else if (canStartGame) {
-                    canStartGame = false;
-
-                    System.out.println("Start the game? Y/N");
-                    String choice = In.nextLine();
-
-                    clientMessageThread.stopWaiting();
-
-                    if (!choice.equals("Y") && !choice.equals("y")) {
-                        outputStream.writeUTF("cantStart");
-                    }
-                    else {
-                        outputStream.writeUTF("canStart");
-                    }
+                    canStartGame();
                 }
                 else if (canStartBet) {
-                    canStartBet = false;
-
-                    System.out.println("Insert the dice value of the bet: ");
-                    int diceValue = In.nextInt();
-                    System.out.println("Insert the dice number of the bet: ");
-                    int diceNumber = In.nextInt();
-
-                    clientMessageThread.stopWaiting();
-
-                    outputStream.writeUTF("startBet:" + "diceValue:" + diceValue + ";" + "diceNumber:" + diceNumber);
+                    canStartBet();
                 }
                 else if (canSendAction) {
-                    canSendAction = false;
-
-                    System.out.println("[--DOUBT OR BET--]");
-                    System.out.println();
-                    System.out.println("1. Doubt");
-                    System.out.println("2. Bet Again");
-
-                    String choice = In.nextLine();
-
-                    clientMessageThread.stopWaiting();
-
-                    if (choice.equals("1") || choice.equals("2")) {
-                        outputStream.writeUTF("action:" + choice);
-                    }
-                    else {
-                        outputStream.writeUTF("action:error");
-                    }
+                    canSendAction();
                 }
                 else if (canSendNewBet) {
-                    canSendNewBet = false;
-
-                    String choice = In.nextLine();
-                    if (choice.equals("1")) {
-                        System.out.println("Change dice value of the bet: ");
-                        String diceValue = In.nextLine();
-
-                        if(diceValue.equals("J")){
-                            diceValue = "1";
-                        }
-                        else{
-                            try{
-                                int diceV = Integer.parseInt(diceValue);
-                            }
-                            catch(NumberFormatException e){
-                                diceValue = "0";
-                            }
-                        }
-
-                        clientMessageThread.stopWaiting();
-
-                        outputStream.writeUTF("diceValue:" + diceValue);
-                    }
-                    else if (choice.equals("2")) {
-                        System.out.println("Change dice number of the bet: ");
-                        int diceNumber = In.nextInt();
-
-                        clientMessageThread.stopWaiting();
-
-                        outputStream.writeUTF("diceNumber:" + diceNumber);
-                    }
+                    canSendNewBet();
                 }
                 else if(canSendSockIt){
-                    canSendSockIt = false;
-
-                    System.out.println("[--CALL SOCK IT--]");
-                    System.out.println("Calling Sock It checks if the last bet is PERFECT.");
-                    System.out.println("If it is you get a dice (WIN).");
-                    System.out.println("If it's not you lose a dice (LOSE).");
-                    System.out.println();
-                    System.out.println("1. Sock It");
-                    System.out.println("2. No");
-
-                    String choice = In.nextLine();
-
-                    clientMessageThread.stopWaiting();
-
-                    if (choice.equals("1")) {
-                        outputStream.writeUTF("sockIt:Y");
-                    }
-                    else {
-                        outputStream.writeUTF("sockIt:N");
-                    }
+                    canSendSockIt();
                 }
             }
         }
         catch (Exception var10) {
             LOGGER.log(Level.SEVERE, "Client Exception, closing client.");
+        }
+    }
+
+    public void canSendNick() throws IOException {
+        canSendNick = false;
+        System.out.println("[--PROFILE--]");
+        System.out.println("Insert your nickname: ");
+        String name = In.nextLine();
+
+        clientMessageThread.stopWaiting();
+
+        outputStream.writeUTF(name);
+    }
+
+    public void canCreateOrJoin() throws IOException {
+        canCreateOrJoin = false;
+        System.out.println("[--CREATE OR JOIN--]");
+        System.out.println();
+        System.out.println("1. Create New Lobby");
+        System.out.println("2. Join Lobby");
+        System.out.println("3. Update Lobby List");
+
+        String choice = In.nextLine();
+
+        clientMessageThread.stopWaiting();
+
+        if (choice.equals("1")) {
+
+            outputStream.writeUTF("createLobby");
+        }
+        else if (choice.equals("2")) {
+            System.out.println();
+            System.out.println("Type the code of the lobby you want to join: ");
+
+            String code = In.nextLine();
+
+            outputStream.writeUTF("joinLobby:" + code);
+        }
+        else if (choice.equals("3")){
+            outputStream.writeUTF("updateLobby");
+        }
+    }
+
+    public void canSendLobbySettings() throws IOException {
+        canSendLobbySettings = false;
+
+        boolean isPublic;
+        String password = "";
+        int maxPlayers = 1;
+        int minPlayers = 0;
+        int maxDices = 0;
+        boolean jollies;
+        boolean sockIt;
+
+        System.out.println("[--LOBBY SETTINGS--]");
+        System.out.println();
+
+        while(true) {
+            System.out.println("Lobby type:");
+            System.out.println("1. Public");
+            System.out.println("2. Private");
+
+            String choice = In.nextLine();
+
+            if (choice.equals("1")) {
+                isPublic = true;
+                break;
+            }
+            else if (choice.equals("2")) {
+                isPublic = false;
+                System.out.println("Type in the password for the lobby:");
+                password = In.nextLine();
+                break;
+            }
+            else{
+                System.out.println();
+                System.out.println("Not a choice.");
+                System.out.println();
+            }
+        }
+
+
+        while(maxPlayers <= 1) {
+            System.out.println("Set MAX number of Players in the lobby: (Default is 6, minimum is 2)");
+            maxPlayers = In.nextInt();
+        }
+
+        while(minPlayers <= 1) {
+            System.out.println("Set MIN number of Players in the lobby: (Default is 2, minimum is 2)");
+            minPlayers = In.nextInt();
+        }
+
+        while(maxDices <= 0) {
+            System.out.println("Set MAX number of dices for each Player in the lobby: (Default is 5, minimum is 1)");
+            maxDices = In.nextInt();
+        }
+
+        while(true) {
+            System.out.println("Allow Jollies?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+
+            String choice = In.nextLine();
+
+            if (choice.equals("1")) {
+                jollies = true;
+                break;
+            }
+            else if (choice.equals("2")) {
+                jollies = false;
+                break;
+            }
+            else{
+                System.out.println();
+                System.out.println("Not a choice.");
+                System.out.println();
+            }
+        }
+
+        while(true) {
+            System.out.println("Allow to declare Sock It?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+
+            String choice = In.nextLine();
+
+            if (choice.equals("1")) {
+                sockIt = true;
+                break;
+            }
+            else if (choice.equals("2")) {
+                sockIt = false;
+                break;
+            }
+            else{
+                System.out.println();
+                System.out.println("Not a choice.");
+                System.out.println();
+            }
+        }
+
+        LobbySettingsPacket lobbySettingsPacket = new LobbySettingsPacket(isPublic, password, maxPlayers, minPlayers, maxDices, jollies, sockIt);
+
+        clientMessageThread.stopWaiting();
+
+        outputStream.writeUTF(lobbySettingsPacket.write());
+    }
+
+    public void canSendPassword() throws IOException {
+        canSendPassword = false;
+
+        System.out.println("Enter the password: ");
+        String password = In.nextLine();
+
+        clientMessageThread.stopWaiting();
+
+        outputStream.writeUTF(password);
+    }
+
+    public void canStartGame() throws IOException {
+        canStartGame = false;
+
+        System.out.println("Start the network.game? Y/N");
+        String choice = In.nextLine();
+
+        clientMessageThread.stopWaiting();
+
+        if (!choice.equals("Y") && !choice.equals("y")) {
+            outputStream.writeUTF("cantStart");
+        }
+        else {
+            outputStream.writeUTF("canStart");
+        }
+    }
+
+    public void canStartBet() throws IOException {
+        canStartBet = false;
+
+        System.out.println("Insert the dice value of the bet: ");
+        int diceValue = In.nextInt();
+        System.out.println("Insert the dice number of the bet: ");
+        int diceNumber = In.nextInt();
+
+        clientMessageThread.stopWaiting();
+
+        outputStream.writeUTF("startBet:" + "diceValue:" + diceValue + ";" + "diceNumber:" + diceNumber);
+    }
+
+    public void canSendAction() throws IOException {
+        canSendAction = false;
+
+        System.out.println("[--DOUBT OR BET--]");
+        System.out.println();
+        System.out.println("1. Doubt");
+        System.out.println("2. Bet Again");
+
+        String choice = In.nextLine();
+
+        clientMessageThread.stopWaiting();
+
+        if (choice.equals("1") || choice.equals("2")) {
+            outputStream.writeUTF("action:" + choice);
+        }
+        else {
+            outputStream.writeUTF("action:error");
+        }
+    }
+
+    public void canSendNewBet() throws IOException {
+        canSendNewBet = false;
+
+        String choice = In.nextLine();
+        if (choice.equals("1")) {
+            System.out.println("Change dice value of the bet: ");
+            String diceValue = In.nextLine();
+
+            if(diceValue.equals("J")){
+                diceValue = "1";
+            }
+            else{
+                try{
+                    int diceV = Integer.parseInt(diceValue);
+                }
+                catch(NumberFormatException e){
+                    diceValue = "0";
+                }
+            }
+
+            clientMessageThread.stopWaiting();
+
+            outputStream.writeUTF("diceValue:" + diceValue);
+        }
+        else if (choice.equals("2")) {
+            System.out.println("Change dice number of the bet: ");
+            int diceNumber = In.nextInt();
+
+            clientMessageThread.stopWaiting();
+
+            outputStream.writeUTF("diceNumber:" + diceNumber);
+        }
+    }
+
+    public void canSendSockIt() throws IOException {
+        canSendSockIt = false;
+
+        System.out.println("[--CALL SOCK IT--]");
+        System.out.println("Calling Sock It checks if the last bet is PERFECT.");
+        System.out.println("If it is you get a dice (WIN).");
+        System.out.println("If it's not you lose a dice (LOSE).");
+        System.out.println();
+        System.out.println("1. Sock It");
+        System.out.println("2. No");
+
+        String choice = In.nextLine();
+
+        clientMessageThread.stopWaiting();
+
+        if (choice.equals("1")) {
+            outputStream.writeUTF("sockIt:Y");
+        }
+        else {
+            outputStream.writeUTF("sockIt:N");
         }
     }
 }
