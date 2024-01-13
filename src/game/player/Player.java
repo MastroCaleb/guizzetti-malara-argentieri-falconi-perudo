@@ -51,12 +51,13 @@ public class Player {
         int times = 1;
 
         for(Dice dice : dices) {
-            if (this.dices.size() == times) {
+            if (times == dices.size()) {
                 value.append(dice.toString());
             }
             else {
                 value.append(dice.toString()).append(" | ");
             }
+            times++;
         }
 
         return value.toString();

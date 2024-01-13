@@ -8,7 +8,7 @@ import network.server.lobbies.Lobby;
 
 public class GameManager implements Runnable {
     private Bet currentBet = null;
-    private int round = 0;
+    private int round = 1;
     private Lobby lobby;
     private int playersAlive = 0;
     private boolean hasFinished = false;
@@ -20,23 +20,36 @@ public class GameManager implements Runnable {
     @Override
     public void run() {
         this.playersAlive = this.lobby.getPlayers().size();
+        this.lobby.sendToAll("");
         this.lobby.sendToAll("Round " + this.round);
+        this.lobby.sendToAll("");
 
         while(true) {
-            for(Player player : lobby.getPlayers()) {
+            for(int i = 0; i<lobby.getPlayers().size(); i++) {
+                Player player = lobby.getPlayers().get(i);
                 try {
                     if (player.hasDices()) {
 
                         if (this.playersAlive == 1 || this.lobby.getPlayers().size() == 1) {
-                            this.lobby.sendToAll("[--WINNER--]");
+                            this.lobby.sendToAll("[--GAME HAS ENDED--]");
                             this.lobby.sendToAll("");
-                            this.lobby.sendToAll(player.getName() + " has won the game.");
+                            this.lobby.sendToAll(player.getName() + " won the game!");
                             this.lobby.sendToAll("");
+
+                            for(Player p : lobby.getPlayers()){
+                                this.lobby.sendToAll("[--LOSERS--]");
+                                this.lobby.sendToAll("");
+                                if(!p.hasDices()){
+                                    this.lobby.sendToAll(player.getName() + " lost.");
+                                    this.lobby.sendToAll("");
+                                }
+                            }
+
                             this.hasFinished = true;
                             return;
                         }
 
-                        this.lobby.sendToAll("Turn of " + player.getName());
+                        this.lobby.sendToAll("Turn of " + player.getName() + ", they have " + player.getDices().size() + " dices left.");
 
                         player.sendToThis(player.getName() + ": " + player.getStringDices());
 
@@ -83,7 +96,6 @@ public class GameManager implements Runnable {
                                 }
 
                                 if (choice.equals("1")) {
-
                                     this.lobby.sendToAll("[--DOUBT--]");
                                     this.lobby.sendToAll("");
                                     this.lobby.sendToAll(player.getName() + " made a Doubt!");
@@ -109,6 +121,11 @@ public class GameManager implements Runnable {
                                             this.lobby.sendToAll(player.getName() + " lost the game.");
                                             this.playersAlive--;
                                         }
+                                        else{
+                                            this.lobby.sendToAll("");
+                                            this.lobby.sendToAll("As " + player.getName() + " lost a dice, they start the next round.");
+                                            i--;
+                                        }
                                     }
                                     else {
                                         this.lobby.sendToAll("Doubt Won. " + this.currentBet.getPlayer().getName() + " lost a dice.");
@@ -119,6 +136,11 @@ public class GameManager implements Runnable {
                                             this.lobby.sendToAll("");
                                             this.lobby.sendToAll(this.currentBet.getPlayer().getName() + " lost the game.");
                                             this.playersAlive--;
+                                        }
+                                        else{
+                                            this.lobby.sendToAll("");
+                                            this.lobby.sendToAll("As " + this.currentBet.getPlayer().getName() + " lost a dice, they start the next round.");
+                                            i--;
                                         }
                                     }
 
@@ -134,7 +156,6 @@ public class GameManager implements Runnable {
                                     this.round++;
 
                                     this.lobby.sendToAll("Round " + this.round);
-                                    this.lobby.sendToAll("");
 
                                     break;
                                 }
@@ -240,33 +261,37 @@ public class GameManager implements Runnable {
 
     public boolean doubt(Player player) {
         boolean value = false;
-        int diceCount = 1;
 
-        label31:
-        for(Player p: lobby.getPlayers()) {
+        int diceCount = countDices();
 
-            for(Dice dice : p.getDices()) {
-                if(p.getDices().size() == diceCount){
-
-                    this.lobby.sendToAll(dice.toString());
-                }
-                else{
-                    this.lobby.sendToAll(dice.toString() + " | ");
-                }
-
-                diceCount++;
-            }
-        }
+        showPlayerDices();
 
         if (this.currentBet.getDiceNumber() > diceCount) {
             value = true;
         }
 
         this.lobby.sendToAll("");
-        Lobby var10000 = this.lobby;
-        int var10001 = this.currentBet.getDiceValue();
-        var10000.sendToAll("Dices with value (" + var10001 + ") found: " + diceCount);
+        this.lobby.sendToAll("Dices with value (" + this.currentBet.getDiceValue() + ") found: " + diceCount);
         this.lobby.sendToAll("");
         return value;
+    }
+
+    public int countDices(){
+        int diceCount = 0;
+        for(Player p: lobby.getPlayers()) {
+            for(Dice dice : p.getDices()) {
+                if(dice.getValue() == this.currentBet.getDiceValue() || dice.getValue() == 1){
+                    diceCount++;
+                }
+            }
+        }
+        return diceCount;
+    }
+
+    public void showPlayerDices(){
+        for(Player player : lobby.getPlayers()){
+            this.lobby.sendToAll(player.getName() + ": " + player.getStringDices());
+            this.lobby.sendToAll("");
+        }
     }
 }

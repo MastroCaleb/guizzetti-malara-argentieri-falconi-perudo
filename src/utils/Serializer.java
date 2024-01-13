@@ -1,8 +1,6 @@
 package utils;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 public class Serializer {
@@ -34,7 +32,6 @@ public class Serializer {
         return values.toString();
     }
 
-    //Apparently has huge bug
     public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
         LinkedList<String> values = getValues(value, ';');
 
@@ -77,31 +74,5 @@ public class Serializer {
             values.add(s);
         }
         return values;
-    }
-
-    private static int countDividers(String value, char divider) {
-        int count = 0;
-
-        for(char t : value.toCharArray()) {
-            if (t == divider) {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    private static LinkedList<Integer> getDividersIndexes(String value, char divider) {
-        int index = 0;
-        LinkedList<Integer> indexes = new LinkedList<Integer>();
-
-        for(char t : value.toCharArray()) {
-            if (t == divider) {
-                indexes.add(index);
-            }
-            index++;
-        }
-
-        return indexes;
     }
 }
