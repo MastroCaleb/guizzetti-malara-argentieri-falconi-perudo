@@ -7,6 +7,7 @@ import network.server.lobbies.Lobby;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.LinkedList;
 
 public class GameManager implements Runnable {
     private Bet currentBet = null;
@@ -16,6 +17,7 @@ public class GameManager implements Runnable {
     private boolean hasFinished = false;
     private boolean palific = false;
     private int palificRound = 0;
+    private LinkedList<Player> allPlayers = new LinkedList<Player>();
 
     public GameManager(Lobby lobby) {
         this.lobby = lobby;
@@ -23,6 +25,7 @@ public class GameManager implements Runnable {
 
     @Override
     public void run() {
+        allPlayers = this.lobby.getPlayers();
         this.playersAlive = this.lobby.getPlayers().size();
         this.lobby.sendToAll("");
         this.lobby.sendToAll("Round " + this.round);
@@ -40,11 +43,15 @@ public class GameManager implements Runnable {
                             this.lobby.sendToAll(player.getName() + " won the game!");
                             this.lobby.sendToAll("");
 
-                            for(Player p : lobby.getPlayers()){
+                            for(Player p : allPlayers){
                                 this.lobby.sendToAll("[--LOSERS--]");
                                 this.lobby.sendToAll("");
                                 if(!p.hasDices()){
-                                    this.lobby.sendToAll(player.getName() + " lost.");
+                                    this.lobby.sendToAll(p.getName() + " lost.");
+                                    this.lobby.sendToAll("");
+                                }
+                                else if(p.getClient().isClosed()){
+                                    this.lobby.sendToAll(p.getName() + " disconnected.");
                                     this.lobby.sendToAll("");
                                 }
                             }
