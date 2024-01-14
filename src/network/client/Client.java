@@ -270,10 +270,10 @@ public class Client implements Runnable {
         clientMessageThread.stopWaiting();
 
         if (choice.equals("1") || choice.equals("2")) {
-            outputStream.writeUTF(new ActionPacket(choice).toString());
+            outputStream.writeUTF(new ActionPacket(choice).getChoice());
         }
         else {
-            outputStream.writeUTF(new ActionPacket("error").toString());
+            outputStream.writeUTF(new ActionPacket("error").getChoice());
         }
     }
 
