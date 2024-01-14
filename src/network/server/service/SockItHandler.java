@@ -38,7 +38,6 @@ public class SockItHandler implements Runnable{
                         }
                     }
                 }
-
             }
         }
         catch (IOException e){

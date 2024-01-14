@@ -23,7 +23,7 @@ public class NewPlayerHandler implements Runnable {
             while(true) {
                 DataInputStream inputStream = new DataInputStream(this.player.getClient().getInputStream());
 
-                while (this.player.getName().equals("Unnamed")) {
+                while(this.player.getName().equals("Unnamed")) {
                     player.sendToThis("askNickName");
 
                     String name = inputStream.readUTF();
@@ -81,8 +81,15 @@ public class NewPlayerHandler implements Runnable {
                     if (lobby == null) {
                         System.out.println("No Lobby with this code was found.");
                     }
-                    else if(lobby.isPublic()){
+                    else if(lobby.isPublic() && !lobby.hasStarted()){
                         lobby.joinLobby(this.player);
+                        player.sendToThis("[--PLAYER LIST--]");
+                        player.sendToThis("");
+                        player.sendToThis(lobby.playerList());
+                        player.sendToThis("");
+                        player.sendToThis("[--LOBBY SETTINGS--]");
+                        player.sendToThis(lobby.getSettings().toString());
+                        player.sendToThis("");
                         break;
                     }
                     else if(!lobby.isPublic()){

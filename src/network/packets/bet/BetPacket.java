@@ -3,8 +3,8 @@ package network.packets.bet;
 import network.packets.Packet;
 
 public class BetPacket extends Packet {
-    private int diceValue;
-    private int diceNumber;
+    private final int diceValue;
+    private final int diceNumber;
 
     public BetPacket(int diceValue, int diceNumber) {
         this.diceValue = diceValue;

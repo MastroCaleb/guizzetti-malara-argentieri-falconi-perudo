@@ -1,6 +1,6 @@
 package network.packets;
 
-import utils.Serializer;
+import utils.serializer.Serializer;
 import utils.interfaces.Serialized;
 
 public class Packet implements Serialized {

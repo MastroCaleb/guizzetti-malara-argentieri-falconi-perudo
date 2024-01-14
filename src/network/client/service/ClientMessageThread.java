@@ -6,7 +6,7 @@ import java.net.Socket;
 import network.client.Client;
 
 public class ClientMessageThread implements Runnable {
-    private Socket client;
+    private final Socket client;
 
     public ClientMessageThread(Socket client) {
         this.client = client;

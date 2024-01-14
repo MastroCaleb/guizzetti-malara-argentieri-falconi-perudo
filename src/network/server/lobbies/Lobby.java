@@ -12,9 +12,9 @@ import network.server.lobbies.settings.LobbySettings;
 import network.server.service.PlayerConnectionHandler;
 
 public class Lobby implements Runnable {
-    private LobbySettings lobbySettings;
-    private Logger LOGGER = Logger.getLogger("Lobby");
-    private LinkedList<Player> players = new LinkedList();
+    private final LobbySettings lobbySettings;
+    private final Logger LOGGER = Logger.getLogger("Lobby");
+    private final LinkedList<Player> players = new LinkedList<>();
     private volatile boolean startSent = false;
     private volatile boolean hasStarted = false;
     private volatile boolean isWaiting = true;
@@ -98,7 +98,7 @@ public class Lobby implements Runnable {
 
             this.isWaiting = true;
         }
-        catch(IOException e){
+        catch(IOException ignored){
         }
     }
 
@@ -118,23 +118,25 @@ public class Lobby implements Runnable {
         return this.hasStarted;
     }
 
-    public void playerList() {
-        System.out.println("Player List (" + this.getNumberOfPlayers() + ") : ");
-        System.out.println();
+    public String playerList() {
+        StringBuilder playerList = new StringBuilder();
+        playerList.append("Player List (").append(this.getNumberOfPlayers()).append(") of Lobby").append(lobbySettings.getLobbyCode()).append(": \n");
+
 
         for(Player player : players) {
             if (player.equals(this.host)) {
-                System.out.println("- " + player.getName() + " (Host)");
+                playerList.append("- ").append(player.getName()).append(" (Host)\n");
             } else {
-                System.out.println("- " + player.getName());
+                playerList.append("- ").append(player.getName()).append("\n");
             }
         }
 
-        System.out.println();
+        playerList.append("\n");
         if (this.isFull()) {
-            System.out.println("This Lobby is full.");
-            System.out.println();
+            playerList.append("This Lobby is full. \n");
         }
+
+        return playerList.toString();
     }
 
     public LinkedList<Player> getPlayers() {
@@ -154,32 +156,15 @@ public class Lobby implements Runnable {
     }
 
     public void sendToAll(String message) {
-        Player temp = null;
         if (!this.players.isEmpty()) {
-            try {
-                for(Player player : players) {
-                    temp = player;
-                    DataOutputStream outputStream = new DataOutputStream(player.getClient().getOutputStream());
+            for(Player p : players) {
+                try{
+                    DataOutputStream outputStream = new DataOutputStream(p.getClient().getOutputStream());
                     outputStream.writeUTF(message);
                 }
-            }
-            catch (IOException e) {
-                leaveLobby(temp);
-            }
-        }
-    }
-
-    public void sendToAllExcept(Player player, String message) {
-        if (!this.players.isEmpty()) {
-            try {
-                for(Player p : players) {
-                    if(!p.equals(player)){
-                        DataOutputStream outputStream = new DataOutputStream(p.getClient().getOutputStream());
-                        outputStream.writeUTF(message);
-                    }
+                catch(IOException e){
+                    this.leaveLobby(p);
                 }
-            }
-            catch (IOException e) {
             }
         }
     }

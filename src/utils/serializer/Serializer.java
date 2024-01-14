@@ -1,10 +1,23 @@
-package utils;
+package utils.serializer;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 
+/**
+ * This class contains methods to serialize/deserialize objects in/from strings
+ */
 public class Serializer {
 
+    /**
+     * This method serializes each one of the object's field and value into a string.
+     *
+     * Example:
+     * fieldName:fieldValue
+     *
+     * @param object
+     * @param fields
+     * @return Serialized object in a String value.
+     */
     public static <T> String serializeObject(T object, Field[] fields) {
         StringBuilder values = new StringBuilder();
         int count = 0;
@@ -25,13 +38,22 @@ public class Serializer {
                 count++;
             }
         }
-        catch (IllegalAccessException var8) {
-            System.out.println("ERRORE");
+        catch (IllegalAccessException e) {
+            System.out.println("ERROR");
         }
 
         return values.toString();
     }
 
+
+    /**
+     * This method deserializes a String value into an Object.
+     *
+     * @param object
+     * @param value
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
     public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
         LinkedList<String> values = getValues(value, ';');
 
@@ -57,7 +79,7 @@ public class Serializer {
         return toObject(field.getType(), value);
     }
 
-    private static Object toObject(Class clazz, String value) {
+    public static Object toObject(Class clazz, String value) {
         if(Boolean.class == clazz || boolean.class == clazz) return Boolean.parseBoolean( value );
         if(Byte.class == clazz || byte.class == clazz) return Byte.parseByte( value );
         if(Short.class == clazz || short.class == clazz) return Short.parseShort( value );

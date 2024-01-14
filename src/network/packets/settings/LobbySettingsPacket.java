@@ -2,8 +2,9 @@ package network.packets.settings;
 
 import network.packets.Packet;
 
+@SuppressWarnings("all")
 public class LobbySettingsPacket extends Packet {
-    private boolean isPublic;
+    private final boolean isPublic;
     private String password = "";
     private int maxPlayers = 6;
     private int minPlayers = 2;

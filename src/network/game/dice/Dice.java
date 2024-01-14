@@ -1,4 +1,4 @@
-package network.game.dices;
+package network.game.dice;
 
 import java.util.Random;
 

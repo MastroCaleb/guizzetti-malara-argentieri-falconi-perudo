@@ -4,13 +4,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import network.client.Client;
 import network.server.Server;
-import utils.In;
+import utils.input.In;
 
 public class Main {
-    private static Logger LOGGER = Logger.getLogger("Main");
-
-    public Main() {
-    }
+    private static final Logger LOGGER = Logger.getLogger("Main");
 
     public static void main(String[] args) {
         try {

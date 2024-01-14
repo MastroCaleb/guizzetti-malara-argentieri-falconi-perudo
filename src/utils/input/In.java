@@ -1,9 +1,12 @@
-package utils;
+package utils.input;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * Input class to facilitate obtaining input.
+ */
 public class In {
     private static final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 

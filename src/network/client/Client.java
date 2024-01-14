@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import network.client.service.ClientMessageThread;
 import network.packets.settings.LobbySettingsPacket;
-import utils.In;
+import utils.input.In;
 
 public class Client implements Runnable {
     public static volatile boolean canSendNick = false;
@@ -19,16 +19,12 @@ public class Client implements Runnable {
     public static volatile boolean canSendAction = false;
     public static volatile boolean canSendNewBet = false;
     public static volatile boolean canSendSockIt = false;
-    private static Logger LOGGER = Logger.getLogger("Client");
-    private String ip;
-    private int port;
+    private static final Logger LOGGER = Logger.getLogger("Client");
     private Socket client;
     private DataOutputStream outputStream;
     private ClientMessageThread clientMessageThread;
 
     public Client(String ip, int port) throws IOException {
-        this.ip = ip;
-        this.port = port;
         this.client = new Socket(ip, port);
     }
 

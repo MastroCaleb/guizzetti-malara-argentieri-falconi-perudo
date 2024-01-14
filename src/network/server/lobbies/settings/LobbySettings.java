@@ -1,10 +1,10 @@
 package network.server.lobbies.settings;
 
 import network.packets.Packet;
-import network.packets.settings.LobbySettingsPacket;
-import utils.Serializer;
-import utils.interfaces.Serialized;
 
+import java.lang.reflect.Field;
+
+@SuppressWarnings("all")
 public class LobbySettings extends Packet {
     private String lobbyCode = "";
     private boolean isPublic;
@@ -20,27 +20,21 @@ public class LobbySettings extends Packet {
     public String getLobbyCode() {
         return this.lobbyCode;
     }
-
     public boolean isPublic() {
         return this.isPublic;
     }
-
     public String getPassword() {
         return this.password;
     }
-
     public int getMaxPlayers() {
         return this.maxPlayers;
     }
-
     public int getMinPlayers() {
         return this.minPlayers;
     }
-
     public int getMaxDices() {
         return this.maxDices;
     }
-
     public boolean useJollies() {
         return this.jollies;
     }
@@ -48,4 +42,16 @@ public class LobbySettings extends Packet {
         return this.sockIt;
     }
 
+    public String toString(){
+        String lobbySettings = "";
+        for(Field field : this.getClass().getDeclaredFields()){
+            try {
+                lobbySettings += "- " + field.getName() + ": " + field.get(this).toString() + "\n";
+            }
+            catch (IllegalAccessException e) {
+                lobbySettings = "";
+            }
+        }
+        return lobbySettings;
+    }
 }

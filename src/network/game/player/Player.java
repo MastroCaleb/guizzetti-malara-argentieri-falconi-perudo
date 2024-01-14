@@ -1,6 +1,6 @@
 package network.game.player;
 
-import network.game.dices.Dice;
+import network.game.dice.Dice;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -8,9 +8,9 @@ import java.util.LinkedList;
 import network.server.lobbies.Lobby;
 
 public class Player {
-    private String name;
-    private Socket client;
-    private LinkedList<Dice> dices = new LinkedList<Dice>();
+    private final String name;
+    private final Socket client;
+    private LinkedList<Dice> dices = new LinkedList<>();
     private String playerInteraction;
 
     public Player(String name, Socket client) {
@@ -28,7 +28,7 @@ public class Player {
     }
 
     public void removeAllDices() {
-        this.dices = new LinkedList<Dice>();
+        this.dices = new LinkedList<>();
     }
     public void removeDice() {
         this.dices.remove();

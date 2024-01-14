@@ -4,7 +4,7 @@ import network.packets.Packet;
 
 @Deprecated
 public class ActionPacket extends Packet {
-    private String choice;
+    private final String choice;
 
     public ActionPacket(String choice) {
         this.choice = choice;

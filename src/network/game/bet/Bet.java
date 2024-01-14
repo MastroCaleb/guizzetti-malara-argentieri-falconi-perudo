@@ -4,7 +4,7 @@ import network.game.player.Player;
 import network.packets.bet.BetPacket;
 
 public class Bet {
-    private Player player;
+    private final Player player;
     private int diceValue = 0;
     private int diceNumber = 0;
 

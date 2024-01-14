@@ -1,7 +1,7 @@
 package network.game.manager;
 
 import network.game.bet.Bet;
-import network.game.dices.Dice;
+import network.game.dice.Dice;
 import network.game.player.Player;
 import network.server.lobbies.Lobby;
 import network.server.service.SockItHandler;
@@ -9,13 +9,12 @@ import network.server.service.SockItHandler;
 import java.io.IOException;
 import java.util.LinkedList;
 
+@SuppressWarnings("deprecation")
 public class GameManager implements Runnable {
 
-    private LinkedList<Player> allPlayers = new LinkedList<Player>();
     private Bet currentBet = null;
     private int round = 1;
-    private Lobby lobby;
-    private int playersAlive = 0;
+    private final Lobby lobby;
     private boolean hasFinished = false;
     //PALIFIC
     private boolean palific = false;
@@ -30,8 +29,8 @@ public class GameManager implements Runnable {
 
     @Override
     public void run() {
-        allPlayers = this.lobby.getPlayers();
-        this.playersAlive = this.lobby.getPlayers().size();
+        LinkedList<Player> allPlayers = this.lobby.getPlayers();
+        int playersAlive = this.lobby.getPlayers().size();
         this.lobby.sendToAll("");
         this.lobby.sendToAll("Round " + this.round);
         this.lobby.sendToAll("");
@@ -41,7 +40,7 @@ public class GameManager implements Runnable {
                 Player player = lobby.getPlayers().get(i);
                 try {
                     if (player.hasDices()) {
-                        if (this.playersAlive == 1 || this.lobby.getPlayers().size() == 1) {
+                        if (playersAlive == 1 || this.lobby.getPlayers().size() == 1) {
                             this.lobby.sendToAll("[--GAME HAS ENDED--]");
                             this.lobby.sendToAll("");
                             this.lobby.sendToAll(player.getName() + " won the network.game!");
@@ -102,12 +101,12 @@ public class GameManager implements Runnable {
                             }
                         }
                         else {
-                            this.lobby.sendToAll("Current Bet: " + this.currentBet.toString());
+                            this.lobby.sendToAll("Current Bet: " + this.currentBet);
 
                             while(!this.lobby.getPlayers().isEmpty()) {
                                 player.sendToThis("askAction");
 
-                                LinkedList<Thread> handlers = new LinkedList<Thread>();
+                                LinkedList<Thread> handlers = new LinkedList<>();
 
                                 if(lobby.getSettings().canSockIt()){
                                     for(Player p : lobby.getPlayers()){
@@ -164,7 +163,7 @@ public class GameManager implements Runnable {
                                         if (!player.hasDices()) {
                                             this.lobby.sendToAll("");
                                             this.lobby.sendToAll(player.getName() + " lost the network.game.");
-                                            this.playersAlive--;
+                                            playersAlive--;
                                         }
                                         else{
                                             this.lobby.sendToAll("");
@@ -186,7 +185,7 @@ public class GameManager implements Runnable {
                                         if (!this.currentBet.getPlayer().hasDices()) {
                                             this.lobby.sendToAll("");
                                             this.lobby.sendToAll(this.currentBet.getPlayer().getName() + " lost the network.game.");
-                                            this.playersAlive--;
+                                            playersAlive--;
                                         }
                                         else{
                                             this.lobby.sendToAll("");
@@ -231,50 +230,46 @@ public class GameManager implements Runnable {
                                             }
                                         }
                                     }
-
-                                    if(sockIt && sockItUser !=  null){
-                                        this.lobby.sendToAll("");
-                                        this.lobby.sendToAll("[--SOCK IT--]");
-                                        this.lobby.sendToAll(sockItUser.getName() + " called a SOCK IT!");
-                                        this.lobby.sendToAll("");
-
-                                        boolean result = sockIt();
-
-                                        if(!result){
-                                            this.lobby.sendToAll("Sock It Lost. " + player.getName() + " lost a dice.");
-
-                                            player.removeDice();
-
-                                            if (!player.hasDices()) {
-                                                this.lobby.sendToAll("");
-                                                this.lobby.sendToAll(player.getName() + " lost the network.game.");
-                                                this.playersAlive--;
-                                            }
-                                            else{
-                                                this.lobby.sendToAll("");
-                                                this.lobby.sendToAll("As " + player.getName() + " lost a dice, they start the next round.");
-                                                if(player.getDices().size() == 1){
-                                                    this.lobby.sendToAll("");
-                                                    this.lobby.sendToAll(player.getName() + " is PALIFIC!");
-                                                    palific = true;
-                                                    palificRound = round;
-                                                }
-                                                i--;
-                                            }
-                                        }
-                                        else{
-                                            this.lobby.sendToAll("Sock It Won! " + player.getName() + " gained a dice!");
-
-                                            player.addDice(lobby.getSettings().useJollies());
-                                        }
-
-                                        this.nextRound();
-                                    }
-
                                     break;
                                 }
-
                                 player.sendToThis("Not a choice that you can make.");
+                            }
+
+                            if(sockIt && sockItUser !=  null) {
+                                this.lobby.sendToAll("");
+                                this.lobby.sendToAll("[--SOCK IT--]");
+                                this.lobby.sendToAll(sockItUser.getName() + " called a SOCK IT!");
+                                this.lobby.sendToAll("");
+
+                                boolean result = sockIt();
+
+                                if (!result) {
+                                    this.lobby.sendToAll("Sock It Lost. " + player.getName() + " lost a dice.");
+
+                                    player.removeDice();
+
+                                    if (!player.hasDices()) {
+                                        this.lobby.sendToAll("");
+                                        this.lobby.sendToAll(player.getName() + " lost the network.game.");
+                                        playersAlive--;
+                                    } else {
+                                        this.lobby.sendToAll("");
+                                        this.lobby.sendToAll("As " + player.getName() + " lost a dice, they start the next round.");
+                                        if (player.getDices().size() == 1) {
+                                            this.lobby.sendToAll("");
+                                            this.lobby.sendToAll(player.getName() + " is PALIFIC!");
+                                            palific = true;
+                                            palificRound = round;
+                                        }
+                                        i--;
+                                    }
+                                } else {
+                                    this.lobby.sendToAll("Sock It Won! " + player.getName() + " gained a dice!");
+
+                                    player.addDice(lobby.getSettings().useJollies());
+                                }
+
+                                this.nextRound();
                             }
                         }
 
