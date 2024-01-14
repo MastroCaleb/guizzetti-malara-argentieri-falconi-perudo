@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import network.client.service.ClientMessageThread;
+import network.packets.action.ActionPacket;
 import network.packets.settings.LobbySettingsPacket;
 import utils.input.In;
 
@@ -269,10 +270,10 @@ public class Client implements Runnable {
         clientMessageThread.stopWaiting();
 
         if (choice.equals("1") || choice.equals("2")) {
-            outputStream.writeUTF("action:" + choice);
+            outputStream.writeUTF(new ActionPacket(choice).toString());
         }
         else {
-            outputStream.writeUTF("action:error");
+            outputStream.writeUTF(new ActionPacket("error").toString());
         }
     }
 
