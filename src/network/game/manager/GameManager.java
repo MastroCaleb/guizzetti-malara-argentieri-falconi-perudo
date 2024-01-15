@@ -43,7 +43,7 @@ public class GameManager implements Runnable {
                         if (playersAlive == 1 || this.lobby.getPlayers().size() == 1) {
                             this.lobby.sendToAll("[--GAME HAS ENDED--]");
                             this.lobby.sendToAll("");
-                            this.lobby.sendToAll(player.getName() + " won the network.game!");
+                            this.lobby.sendToAll(player.getName() + " won the game!");
                             this.lobby.sendToAll("");
 
                             for(Player p : allPlayers){
@@ -162,7 +162,7 @@ public class GameManager implements Runnable {
 
                                         if (!player.hasDices()) {
                                             this.lobby.sendToAll("");
-                                            this.lobby.sendToAll(player.getName() + " lost the network.game.");
+                                            this.lobby.sendToAll(player.getName() + " lost the game.");
                                             playersAlive--;
                                         }
                                         else{
@@ -184,7 +184,7 @@ public class GameManager implements Runnable {
 
                                         if (!this.currentBet.getPlayer().hasDices()) {
                                             this.lobby.sendToAll("");
-                                            this.lobby.sendToAll(this.currentBet.getPlayer().getName() + " lost the network.game.");
+                                            this.lobby.sendToAll(this.currentBet.getPlayer().getName() + " lost the game.");
                                             playersAlive--;
                                         }
                                         else{
@@ -250,7 +250,7 @@ public class GameManager implements Runnable {
 
                                     if (!player.hasDices()) {
                                         this.lobby.sendToAll("");
-                                        this.lobby.sendToAll(player.getName() + " lost the network.game.");
+                                        this.lobby.sendToAll(player.getName() + " lost the game.");
                                         playersAlive--;
                                     } else {
                                         this.lobby.sendToAll("");

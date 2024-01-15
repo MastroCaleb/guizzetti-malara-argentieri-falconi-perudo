@@ -83,13 +83,6 @@ public class NewPlayerHandler implements Runnable {
                     }
                     else if(lobby.isPublic() && !lobby.hasStarted()){
                         lobby.joinLobby(this.player);
-                        player.sendToThis("[--PLAYER LIST--]");
-                        player.sendToThis("");
-                        player.sendToThis(lobby.playerList());
-                        player.sendToThis("");
-                        player.sendToThis("[--LOBBY SETTINGS--]");
-                        player.sendToThis(lobby.getSettings().toString());
-                        player.sendToThis("");
                         break;
                     }
                     else if(!lobby.isPublic()){

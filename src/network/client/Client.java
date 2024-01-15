@@ -78,8 +78,6 @@ public class Client implements Runnable {
         System.out.println("Insert your nickname: ");
         String name = In.nextLine();
 
-        clientMessageThread.stopWaiting();
-
         outputStream.writeUTF(name);
     }
 
@@ -92,8 +90,6 @@ public class Client implements Runnable {
         System.out.println("3. Update Lobby List");
 
         String choice = In.nextLine();
-
-        clientMessageThread.stopWaiting();
 
         if (choice.equals("1")) {
 
@@ -212,8 +208,6 @@ public class Client implements Runnable {
 
         LobbySettingsPacket lobbySettingsPacket = new LobbySettingsPacket(isPublic, password, maxPlayers, minPlayers, maxDices, jollies, sockIt);
 
-        clientMessageThread.stopWaiting();
-
         outputStream.writeUTF(lobbySettingsPacket.write());
     }
 
@@ -223,8 +217,6 @@ public class Client implements Runnable {
         System.out.println("Enter the password: ");
         String password = In.nextLine();
 
-        clientMessageThread.stopWaiting();
-
         outputStream.writeUTF(password);
     }
 
@@ -233,8 +225,6 @@ public class Client implements Runnable {
 
         System.out.println("Start the network.game? Y/N");
         String choice = In.nextLine();
-
-        clientMessageThread.stopWaiting();
 
         if (!choice.equals("Y") && !choice.equals("y")) {
             outputStream.writeUTF("cantStart");
@@ -252,8 +242,6 @@ public class Client implements Runnable {
         System.out.println("Insert the dice number of the bet: ");
         int diceNumber = In.nextInt();
 
-        clientMessageThread.stopWaiting();
-
         outputStream.writeUTF("startBet:" + "diceValue:" + diceValue + ";" + "diceNumber:" + diceNumber);
     }
 
@@ -266,8 +254,6 @@ public class Client implements Runnable {
         System.out.println("2. Bet Again");
 
         String choice = In.nextLine();
-
-        clientMessageThread.stopWaiting();
 
         if (choice.equals("1") || choice.equals("2")) {
             outputStream.writeUTF(new ActionPacket(choice).getChoice());
@@ -297,15 +283,11 @@ public class Client implements Runnable {
                 }
             }
 
-            clientMessageThread.stopWaiting();
-
             outputStream.writeUTF("diceValue:" + diceValue);
         }
         else if (choice.equals("2")) {
             System.out.println("Change dice number of the bet: ");
             int diceNumber = In.nextInt();
-
-            clientMessageThread.stopWaiting();
 
             outputStream.writeUTF("diceNumber:" + diceNumber);
         }
@@ -323,8 +305,6 @@ public class Client implements Runnable {
         System.out.println("2. No");
 
         String choice = In.nextLine();
-
-        clientMessageThread.stopWaiting();
 
         if (choice.equals("1")) {
             outputStream.writeUTF("sockIt:Y");

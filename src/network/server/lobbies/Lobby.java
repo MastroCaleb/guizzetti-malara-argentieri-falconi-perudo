@@ -28,9 +28,8 @@ public class Lobby implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("A Lobby was created successfully.");
         try {
-            while(true){
+            while(true) {
                 if (this.isWaiting && !this.isFull()) {
                     this.sendToAll("Waiting for players (" + this.getNumberOfPlayers() + "/" + this.lobbySettings.getMaxPlayers() + ")");
                     this.isWaiting = false;
@@ -72,8 +71,12 @@ public class Lobby implements Runnable {
         }
     }
 
-    public void joinLobby(Player player) {
+    public void joinLobby(Player player) throws IOException {
         this.players.add(player);
+        player.sendToThis("[--PLAYER LIST--]");
+        player.sendToThis(this.playerList());
+        player.sendToThis("[--LOBBY SETTINGS--]");
+        player.sendToThis(lobbySettings.toString());
         PlayerConnectionHandler playerConnectionHandler = new PlayerConnectionHandler(this, player);
         (new Thread(playerConnectionHandler)).start();
         this.sendToAll(player.getName() + " joined the lobby.");
@@ -86,7 +89,7 @@ public class Lobby implements Runnable {
             player.getClient().close();
             this.players.remove(player);
             if (player.equals(this.host) && !this.players.isEmpty()) {
-                this.host = (Player)this.players.getFirst();
+                this.host = this.players.getFirst();
                 this.startSent = false;
             }
 
@@ -98,63 +101,53 @@ public class Lobby implements Runnable {
 
             this.isWaiting = true;
         }
-        catch(IOException ignored){
-        }
+        catch(IOException ignored){}
     }
 
     public int getNumberOfPlayers() {
         return this.players.size();
     }
-
     public boolean isFull() {
         return this.lobbySettings.getMaxPlayers() <= this.players.size();
     }
-
     public boolean canStart() {
         return this.getNumberOfPlayers() >= this.lobbySettings.getMinPlayers();
     }
-
     public boolean hasStarted() {
         return this.hasStarted;
     }
-
     public String playerList() {
         StringBuilder playerList = new StringBuilder();
-        playerList.append("Player List (").append(this.getNumberOfPlayers()).append(") of Lobby").append(lobbySettings.getLobbyCode()).append(": \n");
-
+        playerList.append("Player List (").append(this.getNumberOfPlayers()).append(") of Lobby with code ").append(lobbySettings.getLobbyCode()).append(": \n");
+        playerList.append("\n");
 
         for(Player player : players) {
             if (player.equals(this.host)) {
                 playerList.append("- ").append(player.getName()).append(" (Host)\n");
-            } else {
+            }
+            else {
                 playerList.append("- ").append(player.getName()).append("\n");
             }
         }
 
-        playerList.append("\n");
         if (this.isFull()) {
             playerList.append("This Lobby is full. \n");
         }
 
         return playerList.toString();
     }
-
     public LinkedList<Player> getPlayers() {
         return this.players;
     }
-
     public void setHasStarted(boolean hasStarted) {
         this.hasStarted = hasStarted;
     }
-
     public void setStartSent(boolean startSent) {
         this.startSent = startSent;
     }
-
     public GameManager getGameManager() {
         return this.gameManager;
     }
-
     public void sendToAll(String message) {
         if (!this.players.isEmpty()) {
             for(Player p : players) {
@@ -168,19 +161,15 @@ public class Lobby implements Runnable {
             }
         }
     }
-
     public String playerCount() {
         return "(" + this.players.size() + "/" + this.lobbySettings.getMaxPlayers() + ")";
     }
-
     public String getCode() {
         return this.lobbySettings.getLobbyCode();
     }
-
     public boolean isPublic() {
         return this.lobbySettings.isPublic();
     }
-
     public LobbySettings getSettings() {
         return this.lobbySettings;
     }

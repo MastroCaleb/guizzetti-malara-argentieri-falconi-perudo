@@ -13,14 +13,12 @@ import network.server.lobbies.Lobby;
 import network.server.service.NewPlayerHandler;
 
 public class Server implements Runnable {
-    private Logger LOGGER = Logger.getLogger("Server");
-    private int port;
-    private ServerSocket serverSocket;
+    private final Logger LOGGER = Logger.getLogger("Server");
+    private final ServerSocket serverSocket;
     public static LinkedList<Player> players = new LinkedList<Player>();
     public static LinkedList<Lobby> lobbies = new LinkedList<Lobby>();
 
     public Server(int port) throws IOException {
-        this.port = port;
         this.serverSocket = new ServerSocket(port);
     }
 
@@ -37,7 +35,6 @@ public class Server implements Runnable {
                 (new Thread(new NewPlayerHandler(player))).start();
             }
         }
-
         catch (IOException e) {
             this.LOGGER.log(Level.SEVERE, "IOException caught. Closing Server.");
         }
@@ -80,7 +77,7 @@ public class Server implements Runnable {
             for(Lobby lobby : lobbies) {
                 if (lobby.isPublic()) {
                     count++;
-                    lobbyList = "" + count + ". " + lobby.getCode() + " " + lobby.playerCount() + "\n";
+                    lobbyList = count + ". " + lobby.getCode() + " " + lobby.playerCount() + "\n";
                 }
             }
 

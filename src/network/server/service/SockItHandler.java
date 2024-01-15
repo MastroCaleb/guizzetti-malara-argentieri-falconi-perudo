@@ -7,8 +7,8 @@ import java.io.IOException;
 
 public class SockItHandler implements Runnable{
 
-    private Player player;
-    private GameManager gameManager;
+    private final Player player;
+    private final GameManager gameManager;
 
     public SockItHandler(Player player, GameManager gameManager){
         this.player = player;
