@@ -23,7 +23,7 @@ public class NewPlayerHandler implements Runnable {
             while(true) {
                 DataInputStream inputStream = new DataInputStream(this.player.getClient().getInputStream());
 
-                while(this.player.getName().equals("Unnamed")) {
+                while(this.player.getName().isEmpty()) {
                     player.sendToThis("askNickName");
 
                     String name = inputStream.readUTF();
@@ -41,7 +41,6 @@ public class NewPlayerHandler implements Runnable {
 
                 Server.players.add(player);
 
-
                 this.player.sendToThis("");
                 this.player.sendToThis(Server.getLobbyList());
                 this.player.sendToThis("");
@@ -52,7 +51,6 @@ public class NewPlayerHandler implements Runnable {
 
                 if (createOrJoin.equals("createLobby")) {
                     this.LOGGER.log(Level.INFO, "New Lobby created.");
-                    this.player.sendToThis("New Lobby created.");
 
                     this.player.sendToThis("askLobbySettings");
 

@@ -119,6 +119,7 @@ public class Client implements Runnable {
         boolean jollies;
         boolean sockIt;
 
+        System.out.println();
         System.out.println("[--LOBBY SETTINGS--]");
         System.out.println();
 

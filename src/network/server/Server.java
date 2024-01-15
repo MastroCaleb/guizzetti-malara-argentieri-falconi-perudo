@@ -31,7 +31,7 @@ public class Server implements Runnable {
 
                 DataInputStream inputStream = new DataInputStream(client.getInputStream());
 
-                Player player = new Player("Unnamed", client);
+                Player player = new Player("", client);
                 (new Thread(new NewPlayerHandler(player))).start();
             }
         }
