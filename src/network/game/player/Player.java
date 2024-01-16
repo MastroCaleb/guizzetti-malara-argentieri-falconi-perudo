@@ -69,21 +69,20 @@ public class Player {
     public String getName() {
         return this.name;
     }
-
     public Socket getClient() {
         return this.client;
     }
-
     public String getPlayerInteraction() {
         return this.playerInteraction;
     }
-
     public void setPlayerInteraction(String playerInteraction) {
         this.playerInteraction = playerInteraction;
     }
-
     public void sendToThis(String message) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(this.client.getOutputStream());
         outputStream.writeUTF(message);
+    }
+    public void ask(String packet) throws IOException {
+        sendToThis("ask" + packet);
     }
 }

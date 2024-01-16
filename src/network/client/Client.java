@@ -21,10 +21,10 @@ public class Client implements Runnable {
     public static volatile boolean canSendNewBet = false;
     public static volatile boolean canSendSockIt = false;
     public static volatile boolean canReconnect = false;
+
     private static final Logger LOGGER = Logger.getLogger("Client");
-    private Socket client;
+    private final Socket client;
     private DataOutputStream outputStream;
-    private ClientMessageThread clientMessageThread;
 
     public Client(String ip, int port) throws IOException {
         this.client = new Socket(ip, port);
@@ -34,7 +34,7 @@ public class Client implements Runnable {
     public void run() {
         try {
             outputStream = new DataOutputStream(this.client.getOutputStream());
-            clientMessageThread = new ClientMessageThread(this.client);
+            ClientMessageThread clientMessageThread = new ClientMessageThread(this.client);
 
             (new Thread(clientMessageThread)).start();
 
@@ -65,9 +65,6 @@ public class Client implements Runnable {
                 }
                 else if(canSendSockIt){
                     canSendSockIt();
-                }
-                else if(canReconnect){
-                    canReconnect();
                 }
             }
         }
@@ -228,7 +225,7 @@ public class Client implements Runnable {
     public void canStartGame() throws IOException {
         canStartGame = false;
 
-        System.out.println("Start the network.game? Y/N");
+        System.out.println("Start the game? Y/N");
         String choice = In.nextLine();
 
         if (!choice.equals("Y") && !choice.equals("y")) {
@@ -252,11 +249,6 @@ public class Client implements Runnable {
 
     public void canSendAction() throws IOException {
         canSendAction = false;
-
-        System.out.println("[--DOUBT OR BET--]");
-        System.out.println();
-        System.out.println("1. Doubt");
-        System.out.println("2. Bet Again");
 
         String choice = In.nextLine();
 
@@ -316,24 +308,6 @@ public class Client implements Runnable {
         }
         else {
             outputStream.writeUTF("sockIt:N");
-        }
-    }
-
-    public void canReconnect() throws IOException {
-        canReconnect = false;
-
-        System.out.println("[--RECONNCET TO LOBBY--]");
-        System.out.println();
-        System.out.println("1. Reconnect");
-        System.out.println("2. No");
-
-        String choice = In.nextLine();
-
-        if (choice.equals("1") || choice.equals("2")) {
-            outputStream.writeUTF(new ActionPacket(choice).getChoice());
-        }
-        else {
-            outputStream.writeUTF(new ActionPacket("error").getChoice());
         }
     }
 }

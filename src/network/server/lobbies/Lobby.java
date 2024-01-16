@@ -37,7 +37,7 @@ public class Lobby implements Runnable {
                 }
 
                 if (this.canStart() && !this.startSent && !this.hasStarted) {
-                    this.host.sendToThis("askStartGame");
+                    this.host.ask("StartGame");
                     this.startSent = true;
                 }
 
@@ -139,6 +139,7 @@ public class Lobby implements Runnable {
     public boolean canStart() {
         return this.getNumberOfPlayers() >= this.lobbySettings.getMinPlayers();
     }
+    @SuppressWarnings("all")
     public boolean hasStarted() {
         return this.hasStarted;
     }

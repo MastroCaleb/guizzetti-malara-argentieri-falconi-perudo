@@ -24,7 +24,7 @@ public class NewPlayerHandler implements Runnable {
                 DataInputStream inputStream = new DataInputStream(this.player.getClient().getInputStream());
 
                 while(this.player.getName().isEmpty()) {
-                    player.sendToThis("askNickName");
+                    player.ask("Nickname");
 
                     String name = inputStream.readUTF();
 
@@ -40,7 +40,12 @@ public class NewPlayerHandler implements Runnable {
                 Lobby disconnectedLobby = wasDisconnectedFromLobby(player);
 
                 if(disconnectedLobby != null){
-                    this.player.sendToThis("askToReconnect");
+                    player.sendToThis("[--RECONNCET TO LOBBY--]");
+                    player.sendToThis("");
+                    player.sendToThis("1. Reconnect");
+                    player.sendToThis("2. No");
+
+                    this.player.ask("Action");
 
                     String action = inputStream.readUTF().replace("action:", "");
 
@@ -59,14 +64,14 @@ public class NewPlayerHandler implements Runnable {
                 this.player.sendToThis(Server.getLobbyList());
                 this.player.sendToThis("");
 
-                this.player.sendToThis("askCreateOrJoinLobby");
+                this.player.ask("CreateOrJoinLobby");
 
                 String createOrJoin = inputStream.readUTF();
 
                 if (createOrJoin.equals("createLobby")) {
                     this.LOGGER.log(Level.INFO, "New Lobby created.");
 
-                    this.player.sendToThis("askLobbySettings");
+                    this.player.ask("LobbySettings");
 
                     String settings = inputStream.readUTF();
 
@@ -107,7 +112,7 @@ public class NewPlayerHandler implements Runnable {
                     }
                     else if(!lobby.isPublic()){
                         while(true) {
-                            this.player.sendToThis("askForPassword");
+                            this.player.ask("ForPassword");
 
                             String password = inputStream.readUTF();
 

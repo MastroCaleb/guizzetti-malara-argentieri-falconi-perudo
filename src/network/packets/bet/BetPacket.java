@@ -14,7 +14,6 @@ public class BetPacket extends Packet {
     public int getDiceValue() {
         return this.diceValue;
     }
-
     public int getDiceNumber() {
         return this.diceNumber;
     }

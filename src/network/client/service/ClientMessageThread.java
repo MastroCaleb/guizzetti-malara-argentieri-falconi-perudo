@@ -20,7 +20,7 @@ public class ClientMessageThread implements Runnable {
                 String message = inputStream.readUTF();
 
                 switch (message) {
-                    case "askNickName" -> {
+                    case "askNickname" -> {
                         Client.canSendNick = true;
                     }
                     case "askCreateOrJoinLobby" -> {
@@ -47,9 +47,6 @@ public class ClientMessageThread implements Runnable {
                     }
                     case "askForSockIt"  -> {
                         Client.canSendSockIt = true;
-                    }
-                    case "askToReconnect" -> {
-                        Client.canReconnect = true;
                     }
                     default -> {System.out.println(message);}
                 }

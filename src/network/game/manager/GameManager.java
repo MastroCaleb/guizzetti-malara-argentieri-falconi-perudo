@@ -71,7 +71,8 @@ public class GameManager implements Runnable {
                             while(!this.lobby.getPlayers().isEmpty()) {
                                 player.sendToThis("[--START BET--]");
                                 player.sendToThis("");
-                                player.sendToThis("askStartBet");
+
+                                player.ask("StartBet");
 
                                 this.startWaiting();
 
@@ -99,7 +100,13 @@ public class GameManager implements Runnable {
                             this.lobby.sendToAll("Current Bet: " + this.currentBet);
 
                             while(!this.lobby.getPlayers().isEmpty()) {
-                                player.sendToThis("askAction");
+
+                                player.sendToThis("[--DOUBT OR BET--]");
+                                player.sendToThis("");
+                                player.sendToThis("1. Doubt");
+                                player.sendToThis("2. Bet Again");
+
+                                player.ask("Action");
 
                                 LinkedList<Thread> handlers = new LinkedList<>();
 
@@ -206,7 +213,7 @@ public class GameManager implements Runnable {
                                         player.sendToThis("1. Change Dice Value (Currently: " + this.currentBet.getDiceValue() + ")");
                                         player.sendToThis("2. Change Dice Number (Currently: " + this.currentBet.getDiceNumber() + ")");
 
-                                        player.sendToThis("askNewBet");
+                                        player.ask("NewBet");
 
                                         this.startWaiting();
 
