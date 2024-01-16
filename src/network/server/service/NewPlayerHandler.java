@@ -37,6 +37,20 @@ public class NewPlayerHandler implements Runnable {
                     }
                 }
 
+                Lobby disconnectedLobby = wasDisconnectedFromLobby(player);
+
+                if(disconnectedLobby != null){
+                    this.player.sendToThis("askToReconnect");
+
+                    String action = inputStream.readUTF().replace("action:", "");
+
+                    if(action.equals("1")){
+                        this.player.sendToThis("Reconnecting to this lobby...");
+                        disconnectedLobby.reJoinLobby(player);
+                        break;
+                    }
+                }
+
                 this.LOGGER.log(Level.INFO, player.getName() + " has connected to the server.");
 
                 Server.players.add(player);
@@ -79,8 +93,16 @@ public class NewPlayerHandler implements Runnable {
                     if (lobby == null) {
                         System.out.println("No Lobby with this code was found.");
                     }
-                    else if(lobby.isPublic() && !lobby.hasStarted()){
-                        lobby.joinLobby(this.player);
+                    else if(lobby.isPublic()){
+                        if(!lobby.hasStarted()){
+                            this.player.sendToThis("Connecting to this lobby...");
+                            lobby.joinLobby(this.player);
+                        }
+                        else if (lobby.wasDisconnected(player)) {
+                            this.player.sendToThis("Reconnecting to this lobby...");
+                            lobby.reJoinLobby(this.player);
+                        }
+
                         break;
                     }
                     else if(!lobby.isPublic()){
@@ -90,8 +112,18 @@ public class NewPlayerHandler implements Runnable {
                             String password = inputStream.readUTF();
 
                             if (lobby.getSettings().getPassword().equals(password)) {
-                                this.player.sendToThis("Correct password.");
-                                lobby.joinLobby(this.player);
+
+                                if(!lobby.hasStarted()){
+                                    this.player.sendToThis("Correct password.");
+                                    this.player.sendToThis("Connecting to this lobby...");
+                                    lobby.joinLobby(this.player);
+                                }
+                                else if (lobby.wasDisconnected(player)) {
+                                    this.player.sendToThis("Correct password.");
+                                    this.player.sendToThis("Reconnecting to this lobby...");
+                                    lobby.reJoinLobby(this.player);
+                                }
+
                                 break;
                             }
                             else {
@@ -115,5 +147,15 @@ public class NewPlayerHandler implements Runnable {
             throw new RuntimeException(e);
         }
     }
+
+    public Lobby wasDisconnectedFromLobby(Player player){
+        for (Lobby lobby : Server.lobbies){
+            if(lobby.wasDisconnected(player)){
+                return lobby;
+            }
+        }
+        return null;
+    }
+
 }
 

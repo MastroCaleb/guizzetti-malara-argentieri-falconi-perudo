@@ -38,6 +38,11 @@ public class Player {
             this.dices.add(new Dice(lobby.getSettings().useJollies()));
         }
     }
+    public void reSetupPlayer(Lobby lobby, int numberOfDices) {
+        for(int i = 0; i < numberOfDices; ++i) {
+            this.dices.add(new Dice(lobby.getSettings().useJollies()));
+        }
+    }
     public void addDice(boolean jollies) {this.dices.add(new Dice(jollies));}
 
     public LinkedList<Dice> getDices() {

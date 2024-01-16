@@ -15,6 +15,7 @@ public class Lobby implements Runnable {
     private final LobbySettings lobbySettings;
     private final Logger LOGGER = Logger.getLogger("Lobby");
     private final LinkedList<Player> players = new LinkedList<>();
+    private final LinkedList<Player> disconnectedPlayers = new LinkedList<>();
     private volatile boolean startSent = false;
     private volatile boolean hasStarted = false;
     private volatile boolean isWaiting = true;
@@ -30,7 +31,7 @@ public class Lobby implements Runnable {
     public void run() {
         try {
             while(true) {
-                if (this.isWaiting && !this.isFull()) {
+                if (this.isWaiting && !this.isFull() && !hasStarted()) {
                     this.sendToAll("Waiting for players (" + this.getNumberOfPlayers() + "/" + this.lobbySettings.getMaxPlayers() + ")");
                     this.isWaiting = false;
                 }
@@ -84,10 +85,25 @@ public class Lobby implements Runnable {
         this.isWaiting = true;
     }
 
+    public void reJoinLobby(Player player) throws IOException {
+        this.players.add(player);
+        this.disconnectedPlayers.remove(player);
+        player.sendToThis("[--PLAYER LIST--]");
+        player.sendToThis(this.playerList());
+        player.sendToThis("[--LOBBY SETTINGS--]");
+        player.sendToThis(lobbySettings.toString());
+        PlayerConnectionHandler playerConnectionHandler = new PlayerConnectionHandler(this, player);
+        (new Thread(playerConnectionHandler)).start();
+        this.sendToAll(player.getName() + " re-joined the lobby.");
+        player.reSetupPlayer(this, getPlayerWithLeastDices());
+        this.isWaiting = true;
+    }
+
     public void leaveLobby(Player player) {
         try{
             player.getClient().close();
             this.players.remove(player);
+            this.disconnectedPlayers.add(player);
             if (player.equals(this.host) && !this.players.isEmpty()) {
                 this.host = this.players.getFirst();
                 this.startSent = false;
@@ -104,6 +120,16 @@ public class Lobby implements Runnable {
         catch(IOException ignored){}
     }
 
+    public int getPlayerWithLeastDices(){
+        int min = players.get(0).getDices().size();
+        for(Player player : players){
+            if(min > player.getDices().size()){
+                min = player.getDices().size();
+            }
+        }
+
+        return min;
+    }
     public int getNumberOfPlayers() {
         return this.players.size();
     }
@@ -115,6 +141,14 @@ public class Lobby implements Runnable {
     }
     public boolean hasStarted() {
         return this.hasStarted;
+    }
+    public boolean wasDisconnected(Player player) {
+        for(Player p : disconnectedPlayers){
+            if(p.getName().equals(player.getName())){
+                return true;
+            }
+        }
+        return false;
     }
     public String playerList() {
         StringBuilder playerList = new StringBuilder();

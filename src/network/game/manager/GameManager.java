@@ -29,7 +29,6 @@ public class GameManager implements Runnable {
 
     @Override
     public void run() {
-        LinkedList<Player> allPlayers = this.lobby.getPlayers();
         int playersAlive = this.lobby.getPlayers().size();
         this.lobby.sendToAll("");
         this.lobby.sendToAll("Round " + this.round);
@@ -46,15 +45,11 @@ public class GameManager implements Runnable {
                             this.lobby.sendToAll(player.getName() + " won the game!");
                             this.lobby.sendToAll("");
 
-                            for(Player p : allPlayers){
+                            for(Player p : lobby.getPlayers()){
                                 this.lobby.sendToAll("[--LOSERS--]");
                                 this.lobby.sendToAll("");
                                 if(!p.hasDices()){
                                     this.lobby.sendToAll(p.getName() + " lost.");
-                                    this.lobby.sendToAll("");
-                                }
-                                else if(p.getClient().isClosed()){
-                                    this.lobby.sendToAll(p.getName() + " disconnected.");
                                     this.lobby.sendToAll("");
                                 }
                             }

@@ -20,6 +20,7 @@ public class Client implements Runnable {
     public static volatile boolean canSendAction = false;
     public static volatile boolean canSendNewBet = false;
     public static volatile boolean canSendSockIt = false;
+    public static volatile boolean canReconnect = false;
     private static final Logger LOGGER = Logger.getLogger("Client");
     private Socket client;
     private DataOutputStream outputStream;
@@ -64,6 +65,9 @@ public class Client implements Runnable {
                 }
                 else if(canSendSockIt){
                     canSendSockIt();
+                }
+                else if(canReconnect){
+                    canReconnect();
                 }
             }
         }
@@ -312,6 +316,24 @@ public class Client implements Runnable {
         }
         else {
             outputStream.writeUTF("sockIt:N");
+        }
+    }
+
+    public void canReconnect() throws IOException {
+        canReconnect = false;
+
+        System.out.println("[--RECONNCET TO LOBBY--]");
+        System.out.println();
+        System.out.println("1. Reconnect");
+        System.out.println("2. No");
+
+        String choice = In.nextLine();
+
+        if (choice.equals("1") || choice.equals("2")) {
+            outputStream.writeUTF(new ActionPacket(choice).getChoice());
+        }
+        else {
+            outputStream.writeUTF(new ActionPacket("error").getChoice());
         }
     }
 }

@@ -48,6 +48,9 @@ public class ClientMessageThread implements Runnable {
                     case "askForSockIt"  -> {
                         Client.canSendSockIt = true;
                     }
+                    case "askToReconnect" -> {
+                        Client.canReconnect = true;
+                    }
                     default -> {System.out.println(message);}
                 }
             }
