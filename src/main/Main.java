@@ -67,9 +67,7 @@ public class Main{
                 }
             }
         }
-        catch (Exception var4) {
-            return;
-        }
+        catch (Exception ignored) {}
     }
 
     private static String[] getConsoleCommand(String filename){
