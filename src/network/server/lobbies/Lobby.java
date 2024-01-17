@@ -46,7 +46,7 @@ public class Lobby implements Runnable {
                         player.removeAllDices();
                         player.setupPlayer(this);
                     }
-
+                    clearAllPlayers();
                     this.LOGGER.log(Level.INFO, "Game has started.");
                     this.gameManager = new GameManager(this);
 
@@ -73,6 +73,7 @@ public class Lobby implements Runnable {
     }
 
     public void joinLobby(Player player) throws IOException {
+        player.clean();
         this.players.add(player);
         player.sendToThis("[--PLAYER LIST--]");
         player.sendToThis(this.playerList());
@@ -86,6 +87,7 @@ public class Lobby implements Runnable {
     }
 
     public void reJoinLobby(Player player) throws IOException {
+        player.clean();
         this.players.add(player);
         this.disconnectedPlayers.remove(player);
         player.sendToThis("[--PLAYER LIST--]");
@@ -182,6 +184,11 @@ public class Lobby implements Runnable {
     }
     public GameManager getGameManager() {
         return this.gameManager;
+    }
+    public void clearAllPlayers() throws IOException {
+        for (Player player : players){
+            player.ask("Clean");
+        }
     }
     public void sendToAll(String message) {
         if (!this.players.isEmpty()) {

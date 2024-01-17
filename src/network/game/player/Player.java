@@ -1,5 +1,6 @@
 package network.game.player;
 
+import main.Main;
 import network.game.dice.Dice;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -84,5 +85,10 @@ public class Player {
     }
     public void ask(String packet) throws IOException {
         sendToThis("ask" + packet);
+    }
+    public void clean() throws IOException {
+        if(Main.isConsole()){
+            ask("Clean");
+        }
     }
 }

@@ -20,7 +20,6 @@ public class Client implements Runnable {
     public static volatile boolean canSendAction = false;
     public static volatile boolean canSendNewBet = false;
     public static volatile boolean canSendSockIt = false;
-    public static volatile boolean canReconnect = false;
 
     private static final Logger LOGGER = Logger.getLogger("Client");
     private final Socket client;
@@ -120,7 +119,6 @@ public class Client implements Runnable {
         boolean jollies;
         boolean sockIt;
 
-        System.out.println();
         System.out.println("[--LOBBY SETTINGS--]");
         System.out.println();
 
@@ -295,8 +293,8 @@ public class Client implements Runnable {
 
         System.out.println("[--CALL SOCK IT--]");
         System.out.println("Calling Sock It checks if the last bet is PERFECT.");
-        System.out.println("If it is you get a dice (WIN).");
-        System.out.println("If it's not you lose a dice (LOSE).");
+        System.out.println("- If it is you get a dice (WIN).");
+        System.out.println("- If it's not you lose a dice (LOSE).");
         System.out.println();
         System.out.println("1. Sock It");
         System.out.println("2. No");

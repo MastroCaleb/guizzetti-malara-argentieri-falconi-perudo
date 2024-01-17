@@ -48,12 +48,15 @@ public class ClientMessageThread implements Runnable {
                     case "askForSockIt"  -> {
                         Client.canSendSockIt = true;
                     }
+                    case "askClean" -> {
+                        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+                    }
                     default -> {System.out.println(message);}
                 }
             }
         }
-        catch (IOException var5) {
-            System.out.println("Problem getting messages.");
+        catch (IOException | InterruptedException var5) {
+            System.out.println("An error has occurred.");
         }
     }
 

@@ -1,5 +1,6 @@
 package network.server.service;
 
+import main.Main;
 import network.game.player.Player;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -40,7 +41,9 @@ public class NewPlayerHandler implements Runnable {
                 Lobby disconnectedLobby = wasDisconnectedFromLobby(player);
 
                 if(disconnectedLobby != null){
-                    player.sendToThis("[--RECONNCET TO LOBBY--]");
+                    player.clean();
+
+                    player.sendToThis("[--RECONNECT TO LOBBY--]");
                     player.sendToThis("");
                     player.sendToThis("1. Reconnect");
                     player.sendToThis("2. No");
@@ -56,6 +59,8 @@ public class NewPlayerHandler implements Runnable {
                     }
                 }
 
+                player.clean();
+
                 this.LOGGER.log(Level.INFO, player.getName() + " has connected to the server.");
 
                 Server.players.add(player);
@@ -70,6 +75,8 @@ public class NewPlayerHandler implements Runnable {
 
                 if (createOrJoin.equals("createLobby")) {
                     this.LOGGER.log(Level.INFO, "New Lobby created.");
+
+                    player.clean();
 
                     this.player.ask("LobbySettings");
 
@@ -144,12 +151,9 @@ public class NewPlayerHandler implements Runnable {
                 }
             }
         }
-        catch (IOException e) {
+        catch (IOException | NoSuchFieldException | IllegalAccessException e) {
             Server.players.remove(player);
             LOGGER.log(Level.WARNING, player.getName() + " has disconnected from the server.");
-        }
-        catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
         }
     }
 

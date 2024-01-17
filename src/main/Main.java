@@ -3,19 +3,17 @@ package main;
 import java.awt.*;
 import java.io.Console;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import network.client.Client;
 import network.server.Server;
 import utils.input.In;
 
-public class Main {
+public class Main{
     private static final Logger LOGGER = Logger.getLogger("Main");
-    static boolean console = false; //Make true only for jar builds
-
-    public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
-        if(console){
+    public static String filename = "";
+    public static void main(String[] args) throws IOException, InterruptedException {
+        filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
+        if(isConsole()){
             openConsole();
         }
         else{
@@ -23,15 +21,15 @@ public class Main {
         }
     }
 
-    private static void openConsole() throws IOException, InterruptedException, URISyntaxException {
+    private static void openConsole() throws IOException, InterruptedException {
         Console console = System.console();
         if(console == null && !GraphicsEnvironment.isHeadless()){
-            String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
             Runtime.getRuntime().exec(getConsoleCommand(filename));
         }
         else{
             startPerudo();
-            System.out.println("Program has ended, please type 'exit' to close the console");
+            //System.out.println("Program has ended, please type 'exit' to close the console");
+            new ProcessBuilder("cmd", "/c", "exit").inheritIO().start().waitFor();
         }
     }
 
@@ -64,13 +62,13 @@ public class Main {
                     (new Thread(new Client(ip, port))).start();
                     break;
                 }
-                else if (!choice.equals("3")) {
+                else if (choice.equals("3")) {
                     break;
                 }
             }
         }
         catch (Exception var4) {
-            LOGGER.log(Level.SEVERE, "IOException encountered. Not the correct input.");
+            return;
         }
     }
 
@@ -81,7 +79,11 @@ public class Main {
             return new String[]{"cmd","/c","start","cmd","/k","java -jar \"" + filename + "\""};
         }
         else{
-            return new String[]{"sh","-c","xdg-open","sh","--init-file","java -jar \"" + filename + "\""};
+            return new String[]{"sh","-c","xdg-open","sh","--init-file","java -jar \"" + filename + "\""}; //don't really know if this works for Linux
         }
+    }
+
+    public static boolean isConsole(){
+        return filename.contains(".jar");
     }
 }
