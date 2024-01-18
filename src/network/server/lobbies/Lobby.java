@@ -203,6 +203,9 @@ public class Lobby implements Runnable {
     public LinkedList<Player> getPlayers() {
         return this.players;
     }
+    public LinkedList<Player> getDisconnectedPlayers() {
+        return disconnectedPlayers;
+    }
     public void setHasStarted(boolean hasStarted) {
         this.hasStarted = hasStarted;
     }

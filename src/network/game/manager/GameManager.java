@@ -46,16 +46,27 @@ public class GameManager implements Runnable {
                             this.lobby.sendToAll(player.getName() + " won the game!");
                             this.lobby.sendToAll("");
 
-                            for(Player p : lobby.getPlayers()){
+                            LinkedList<Player> losers = getLosers();
+                            LinkedList<Player> disconnected = lobby.getDisconnectedPlayers();
+
+                            if(!losers.isEmpty()){
                                 this.lobby.sendToAll("[--LOSERS--]");
-                                this.lobby.sendToAll("");
-                                if(!p.hasDices()){
-                                    this.lobby.sendToAll(p.getName() + " lost.");
-                                    this.lobby.sendToAll("");
+                                for(Player p : losers){
+                                    this.lobby.sendToAll("- " + p.getName());
                                 }
                             }
 
-                            this.hasFinished = true;
+                            this.lobby.sendToAll("");
+
+                            if(!disconnected.isEmpty()){
+                                this.lobby.sendToAll("[--DISCONNECTED--]");
+                                for(Player p : disconnected){
+                                    this.lobby.sendToAll("- " + p.getName());
+                                }
+
+                                this.hasFinished = true;
+                            }
+
                             return;
                         }
 
@@ -415,7 +426,6 @@ public class GameManager implements Runnable {
             sockIt = true;
         }
     }
-
     public int minDiceValue(){
         if(this.lobby.getSettings().useJollies() && !palific){
             return 1;
@@ -424,7 +434,6 @@ public class GameManager implements Runnable {
             return 2;
         }
     }
-
     public void nextRound(){
         this.currentBet = null;
         this.lobby.sendToAll("");
@@ -442,5 +451,16 @@ public class GameManager implements Runnable {
         this.round++;
 
         this.lobby.sendToAll("Round " + this.round);
+    }
+    public LinkedList<Player> getLosers(){
+        LinkedList<Player> losers = new LinkedList<>();
+
+        for (Player player : lobby.getPlayers()){
+            if(!player.hasDices()){
+                losers.add(player);
+            }
+        }
+
+        return losers;
     }
 }
