@@ -36,11 +36,8 @@ public class GameManager implements Runnable {
 
         while(true) {
 
-            LinkedList<Player> players = lobby.getPlayers();
-            System.out.println("Players: " + players.size());
-
-            for(int i = 0; i<players.size(); i++) {
-                Player player = players.get(i);
+            for(int i = 0; i<lobby.getPlayers().size(); i++) {
+                Player player = lobby.getPlayers().get(i);
                 try {
                     if (player.hasDices()) {
                         if (playersAlive == 1 || this.lobby.getPlayers().size() == 1) {
@@ -85,13 +82,15 @@ public class GameManager implements Runnable {
                                 }
 
                                 String[] bet = choice.split(";");
+                                try{
+                                    String diceValue = bet[0].replace("diceValue:", "");
+                                    String diceNumber = bet[1].replace("diceNumber:", "");
 
-                                String diceValue = bet[0].replace("diceValue:", "");
-                                String diceNumber = bet[1].replace("diceNumber:", "");
-
-                                if (this.setStartBet(player, Integer.parseInt(diceValue), Integer.parseInt(diceNumber))) {
-                                    break;
+                                    if (this.setStartBet(player, Integer.parseInt(diceValue), Integer.parseInt(diceNumber))) {
+                                        break;
+                                    }
                                 }
+                                catch(ArrayIndexOutOfBoundsException ignored){}
                             }
 
                             if(currentBet != null){
@@ -200,7 +199,8 @@ public class GameManager implements Runnable {
                                                 palific = true;
                                                 palificRound = round;
                                             }
-                                            i = lobby.getPlayers().indexOf(this.currentBet.getPlayer());
+                                            System.out.println("Next round should be given to: " +  this.currentBet.getPlayer().getName());
+                                            i = lobby.getPlayers().indexOf(this.currentBet.getPlayer()) - 1;
                                         }
                                     }
 

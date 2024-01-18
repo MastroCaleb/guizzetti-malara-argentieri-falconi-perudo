@@ -78,7 +78,7 @@ public class Lobby implements Runnable {
             this.sendToAll("Waiting for players (" + this.getNumberOfPlayers() + "/" + this.lobbySettings.getMaxPlayers() + ")");
         }
 
-        if(startSent && !hasStarted){
+        if(this.canStart() && !hasStarted){
             host.sendToThis("Start the game? Y/N");
         }
 
@@ -152,7 +152,7 @@ public class Lobby implements Runnable {
     public int getPlayerWithLeastDices(){
         int min = players.get(0).getDices().size();
         for(Player player : players){
-            if(min > player.getDices().size()){
+            if(min > player.getDices().size() && !player.getDices().isEmpty()){
                 min = player.getDices().size();
             }
         }
