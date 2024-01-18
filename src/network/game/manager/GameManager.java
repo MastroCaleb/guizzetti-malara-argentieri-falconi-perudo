@@ -16,9 +16,11 @@ public class GameManager implements Runnable {
     private int round = 1;
     private final Lobby lobby;
     private boolean hasFinished = false;
+
     //PALIFIC
     private boolean palific = false;
     private int palificRound = 0;
+
     //SOCK IT
     private Player sockItUser = null;
     private boolean sockIt = false;
@@ -420,12 +422,21 @@ public class GameManager implements Runnable {
         }
     }
 
+    public void showHiddenPlayerDices() throws IOException {
+        for(Player player : lobby.getPlayers()){
+            player.sendToThis(player.getName() + ": " + player.getStringDices());
+            this.lobby.sendToAllExcept(player.getName() + ": " + player.getHiddenStringDices(), player);
+            this.lobby.sendToAll("");
+        }
+    }
+
     public void setSockIt(Player player) {
         if(!sockIt){
             sockItUser = player;
             sockIt = true;
         }
     }
+
     public int minDiceValue(){
         if(this.lobby.getSettings().useJollies() && !palific){
             return 1;
@@ -434,7 +445,8 @@ public class GameManager implements Runnable {
             return 2;
         }
     }
-    public void nextRound(){
+
+    public void nextRound() throws IOException {
         this.currentBet = null;
         this.lobby.sendToAll("");
         this.lobby.sendToAll("RE-ROLLING ALL PLAYER'S DICES");
@@ -444,6 +456,8 @@ public class GameManager implements Runnable {
             p.rollAll();
         }
 
+        showHiddenPlayerDices();
+
         if(palific && palificRound!=round){
             palific = false;
         }
@@ -452,6 +466,7 @@ public class GameManager implements Runnable {
 
         this.lobby.sendToAll("Round " + this.round);
     }
+
     public LinkedList<Player> getLosers(){
         LinkedList<Player> losers = new LinkedList<>();
 

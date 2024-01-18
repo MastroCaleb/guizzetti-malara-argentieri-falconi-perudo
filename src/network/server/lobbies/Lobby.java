@@ -233,6 +233,21 @@ public class Lobby implements Runnable {
             }
         }
     }
+    public void sendToAllExcept(String message, Player except) {
+        if (!this.players.isEmpty()) {
+            for(Player p : players) {
+                if(!p.equals(except)){
+                    try{
+                        DataOutputStream outputStream = new DataOutputStream(p.getClient().getOutputStream());
+                        outputStream.writeUTF(message);
+                    }
+                    catch(IOException e){
+                        this.leaveLobby(p);
+                    }
+                }
+            }
+        }
+    }
     public void removeDisconnected(Player player){
         Player toRemove = null;
         if(!disconnectedPlayers.isEmpty()){
