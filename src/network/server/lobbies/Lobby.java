@@ -6,14 +6,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import network.server.Server;
 import network.server.lobbies.settings.LobbySettings;
 import network.server.service.PlayerConnectionHandler;
+import utils.logger.Logger;
+import utils.logger.LoggerLevel;
 
 public class Lobby implements Runnable {
     private final LobbySettings lobbySettings;
-    private final Logger LOGGER = Logger.getLogger("Lobby");
+    private final Logger LOGGER;
     private final LinkedList<Player> players = new LinkedList<>();
     private final LinkedList<Player> disconnectedPlayers = new LinkedList<>();
     private volatile boolean startSent = false;
@@ -24,12 +26,16 @@ public class Lobby implements Runnable {
     public Lobby(Player host, LobbySettings lobbySettings) {
         this.host = host;
         this.lobbySettings = lobbySettings;
+        this.LOGGER = new Logger("Lobby(" + lobbySettings.getLobbyCode() + ")");
     }
 
     @Override
     public void run() {
         try {
             while(true) {
+                if(this.isFull()){
+                    LOGGER.log(LoggerLevel.INFO, "This lobby is full.");
+                }
 
                 if (this.hasStarted && this.gameManager == null) {
                     for(Player player : players){
@@ -37,27 +43,27 @@ public class Lobby implements Runnable {
                         player.setupPlayer(this);
                     }
                     clearAllPlayers();
-                    this.LOGGER.log(Level.INFO, "Game has started.");
+                    LOGGER.log(LoggerLevel.INFO, "A Game has started.");
                     this.gameManager = new GameManager(this);
 
                     (new Thread(this.gameManager)).start();
                 }
                 else if (this.hasStarted && this.gameManager != null && this.gameManager.hasFinished()) {
-                    this.LOGGER.log(Level.INFO, "Game has ended.");
+                    LOGGER.log(LoggerLevel.INFO, "A Game has ended.");
                     this.hasStarted = false;
                     this.startSent = false;
                     this.gameManager = null;
                 }
 
                 if(this.players.isEmpty()){
-                    this.LOGGER.log(Level.WARNING, "Lobby was found empty. Shutting down.");
+                    LOGGER.log(LoggerLevel.WARNING, "This lobby was found empty. Closing the lobby.");
                     Server.lobbies.remove(this);
                     break;
                 }
             }
         }
         catch (Exception var3) {
-            this.LOGGER.log(Level.SEVERE, "Lobby encountered an exception. Shutting down.");
+            LOGGER.log(LoggerLevel.ERROR, "This lobby is shutting down after an Exception.");
             Server.lobbies.remove(this);
         }
     }
@@ -112,13 +118,13 @@ public class Lobby implements Runnable {
             this.sendToAll("Waiting for players (" + this.getNumberOfPlayers() + "/" + this.lobbySettings.getMaxPlayers() + ")");
         }
 
-        if(startSent && !hasStarted){
-            host.sendToThis("Start the game? Y/N");
-        }
-
         if (this.canStart() && !this.startSent && !this.hasStarted) {
             this.host.ask("StartGame");
             this.startSent = true;
+        }
+
+        if(startSent && !hasStarted){
+            host.sendToThis("Start the game? Y/N");
         }
     }
 

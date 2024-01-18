@@ -1,17 +1,17 @@
 package network.server.service;
 
-import main.Main;
 import network.game.player.Player;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import network.server.Server;
 import network.server.lobbies.Lobby;
 import network.server.lobbies.settings.LobbySettings;
+import utils.logger.Logger;
+import utils.logger.LoggerLevel;
 
 public class NewPlayerHandler implements Runnable {
-    private Logger LOGGER = Logger.getLogger("NewPlayerHandler");
+    private final Logger LOGGER = new Logger("NewPlayerHandler");
     private Player player;
 
     public NewPlayerHandler(Player player) {
@@ -41,6 +41,8 @@ public class NewPlayerHandler implements Runnable {
                 Lobby disconnectedLobby = wasDisconnectedFromLobby(player);
 
                 if(disconnectedLobby != null){
+                    this.LOGGER.log(LoggerLevel.INFO, "Found reconnection of " + this.player.getName() + ".");
+
                     player.clean();
 
                     player.sendToThis("[--RECONNECT TO LOBBY--]");
@@ -61,7 +63,7 @@ public class NewPlayerHandler implements Runnable {
 
                 player.clean();
 
-                this.LOGGER.log(Level.INFO, player.getName() + " has connected to the server.");
+                this.LOGGER.log(LoggerLevel.INFO, player.getName() + " has connected to the server.");
 
                 Server.players.add(player);
 
@@ -74,7 +76,7 @@ public class NewPlayerHandler implements Runnable {
                 String createOrJoin = inputStream.readUTF();
 
                 if (createOrJoin.equals("createLobby")) {
-                    this.LOGGER.log(Level.INFO, "New Lobby created.");
+                    this.LOGGER.log(LoggerLevel.INFO, "Creating a new Lobby.");
 
                     player.clean();
 
@@ -95,6 +97,7 @@ public class NewPlayerHandler implements Runnable {
 
                     Server.lobbies.add(lobby);
                     (new Thread(lobby)).start();
+                    this.LOGGER.log(LoggerLevel.INFO, "New Lobby created.");
                     break;
                 }
                 else if (createOrJoin.contains("joinLobby:")){
@@ -103,7 +106,7 @@ public class NewPlayerHandler implements Runnable {
                     Lobby lobby = Server.getLobbyFromCode(code);
 
                     if (lobby == null) {
-                        System.out.println("No Lobby with this code was found.");
+                        player.sendToThis("No Lobby with this code was found.");
                     }
                     else if(lobby.isPublic()){
                         if(!lobby.hasStarted()){
@@ -153,7 +156,7 @@ public class NewPlayerHandler implements Runnable {
         }
         catch (IOException | NoSuchFieldException | IllegalAccessException e) {
             Server.players.remove(player);
-            LOGGER.log(Level.WARNING, player.getName() + " has disconnected from the server.");
+            LOGGER.log(LoggerLevel.WARNING, player.getName() + " has disconnected from the server.");
         }
     }
 

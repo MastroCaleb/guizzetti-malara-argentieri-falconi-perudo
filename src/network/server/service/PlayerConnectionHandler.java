@@ -2,17 +2,21 @@ package network.server.service;
 
 import network.game.player.Player;
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.net.SocketException;
+
 import network.server.lobbies.Lobby;
+import utils.logger.Logger;
+import utils.logger.LoggerLevel;
 
 public class PlayerConnectionHandler implements Runnable {
-    private Lobby lobby;
-    private Player player;
+    private final Logger LOGGER;
+    private final Lobby lobby;
+    private final Player player;
 
     public PlayerConnectionHandler(Lobby lobby, Player player) {
         this.lobby = lobby;
         this.player = player;
+        this.LOGGER = new Logger("ConnectionHandler(" + player.getName() + ")");
     }
 
     @Override
@@ -68,8 +72,9 @@ public class PlayerConnectionHandler implements Runnable {
 
             this.lobby.leaveLobby(this.player);
         }
-        catch (IOException e) {
-            System.out.println("Error");
+        catch (Exception e) {
+            LOGGER.log(LoggerLevel.ERROR, "Encountered an Exception. Disconnecting " + player.getName() + " from the server.");
+            this.lobby.leaveLobby(this.player);
         }
     }
 }

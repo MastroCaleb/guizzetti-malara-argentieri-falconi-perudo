@@ -2,17 +2,21 @@ package network.server.service;
 
 import network.game.manager.GameManager;
 import network.game.player.Player;
+import utils.logger.Logger;
+import utils.logger.LoggerLevel;
 
 import java.io.IOException;
 
 public class SockItHandler implements Runnable{
 
+    private final Logger LOGGER;
     private final Player player;
     private final GameManager gameManager;
 
     public SockItHandler(Player player, GameManager gameManager){
         this.player = player;
         this.gameManager = gameManager;
+        this.LOGGER = new Logger("SockItHandler(" + player.getName() + ")");
     }
     @Override
     public void run(){
@@ -40,7 +44,8 @@ public class SockItHandler implements Runnable{
                 }
             }
         }
-        catch (IOException e){
+        catch (Exception e){
+            LOGGER.log(LoggerLevel.ERROR, "An Exception was found. Disconnecting " + player.getName() + " from server.");
             this.gameManager.getLobby().leaveLobby(player);
         }
     }

@@ -6,8 +6,11 @@ import java.net.Socket;
 
 import main.Main;
 import network.client.Client;
+import utils.logger.Logger;
+import utils.logger.LoggerLevel;
 
 public class ClientMessageThread implements Runnable {
+    private final Logger LOGGER = new Logger("Client");
     private final Socket client;
     private final Client clientThread;
     public ClientMessageThread(Socket client, Client clientThread) {
@@ -59,14 +62,14 @@ public class ClientMessageThread implements Runnable {
             }
         }
         catch (IOException | InterruptedException var5) {
-            System.out.println("The server encountered problems and shut down.");
+            LOGGER.log(LoggerLevel.WARNING, "The server shut down.");
             try {
                 client.close();
                 clientThread.stop();
                 Main.main(new String[0]);
             }
             catch (IOException | InterruptedException e) {
-                System.out.println("Error has occurred.");
+                LOGGER.log(LoggerLevel.ERROR, "An error occurred, closing this thread.");
             }
         }
     }

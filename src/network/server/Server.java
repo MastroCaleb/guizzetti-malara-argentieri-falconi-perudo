@@ -8,12 +8,13 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import network.server.lobbies.Lobby;
 import network.server.service.NewPlayerHandler;
+import utils.logger.Logger;
+import utils.logger.LoggerLevel;
 
 public class Server implements Runnable {
-    private final Logger LOGGER = Logger.getLogger("Server");
+    private final Logger LOGGER = new Logger("MainServer");
     private final ServerSocket serverSocket;
     public static LinkedList<Player> players = new LinkedList<Player>();
     public static LinkedList<Lobby> lobbies = new LinkedList<Lobby>();
@@ -29,14 +30,14 @@ public class Server implements Runnable {
             while(true) {
                 Socket client = this.serverSocket.accept();
 
-                DataInputStream inputStream = new DataInputStream(client.getInputStream());
+                this.LOGGER.log(LoggerLevel.INFO, "A new Client connected. Creating a new Player instance.");
 
                 Player player = new Player("", client);
                 (new Thread(new NewPlayerHandler(player))).start();
             }
         }
         catch (IOException e) {
-            this.LOGGER.log(Level.SEVERE, "IOException caught. Closing Server.");
+            this.LOGGER.log(LoggerLevel.ERROR, "An Exception was caught. Closing the server.");
         }
     }
 

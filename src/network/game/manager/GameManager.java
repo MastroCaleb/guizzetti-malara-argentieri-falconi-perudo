@@ -5,6 +5,8 @@ import network.game.dice.Dice;
 import network.game.player.Player;
 import network.server.lobbies.Lobby;
 import network.server.service.SockItHandler;
+import utils.logger.Logger;
+import utils.logger.LoggerLevel;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -12,6 +14,7 @@ import java.util.LinkedList;
 @SuppressWarnings("deprecation")
 public class GameManager implements Runnable {
 
+    private final Logger LOGGER = new Logger("GameManager");
     private Bet currentBet = null;
     private int round = 1;
     private final Lobby lobby;
@@ -296,10 +299,11 @@ public class GameManager implements Runnable {
                     }
                 }
                 catch(IOException e){
+                    LOGGER.log(LoggerLevel.ERROR, "Player encountered an exception and is being disconnected.");
                     this.lobby.leaveLobby(player);
                 }
                 catch (InterruptedException e) {
-                    System.out.println("GameManager encountered a problem. Closing.");
+                    LOGGER.log(LoggerLevel.ERROR, "The GameManager encountered a Thread error and is stopping.");
                 }
             }
         }

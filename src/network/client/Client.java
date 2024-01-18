@@ -3,7 +3,6 @@ package network.client;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.logging.Logger;
 import network.client.service.ClientMessageThread;
 import network.packets.action.ActionPacket;
 import network.packets.settings.LobbySettingsPacket;
@@ -24,7 +23,6 @@ public class Client implements Runnable {
 
     //OTHER
     public volatile boolean keepGoing = true;
-    private static final Logger LOGGER = Logger.getLogger("Client");
     private final Socket client;
     private DataOutputStream outputStream;
 
