@@ -18,7 +18,6 @@ public class Lobby implements Runnable {
     private final LinkedList<Player> disconnectedPlayers = new LinkedList<>();
     private volatile boolean startSent = false;
     private volatile boolean hasStarted = false;
-    private volatile boolean isWaiting = true;
     private Player host;
     private GameManager gameManager;
 
@@ -31,15 +30,6 @@ public class Lobby implements Runnable {
     public void run() {
         try {
             while(true) {
-                if (this.isWaiting && !this.isFull() && !hasStarted()) {
-                    this.sendToAll("Waiting for players (" + this.getNumberOfPlayers() + "/" + this.lobbySettings.getMaxPlayers() + ")");
-                    this.isWaiting = false;
-                }
-
-                if (this.canStart() && !this.startSent && !this.hasStarted) {
-                    this.host.ask("StartGame");
-                    this.startSent = true;
-                }
 
                 if (this.hasStarted && this.gameManager == null) {
                     for(Player player : players){
@@ -83,13 +73,25 @@ public class Lobby implements Runnable {
         (new Thread(playerConnectionHandler)).start();
         this.sendToAll(player.getName() + " joined the lobby.");
         player.setupPlayer(this);
-        this.isWaiting = true;
+
+        if (!this.isFull() && !hasStarted()) {
+            this.sendToAll("Waiting for players (" + this.getNumberOfPlayers() + "/" + this.lobbySettings.getMaxPlayers() + ")");
+        }
+
+        if(startSent && !hasStarted){
+            host.sendToThis("Start the game? Y/N");
+        }
+
+        if (this.canStart() && !this.startSent && !this.hasStarted) {
+            this.host.ask("StartGame");
+            this.startSent = true;
+        }
     }
 
     public void reJoinLobby(Player player) throws IOException {
         player.clean();
         this.players.add(player);
-        this.disconnectedPlayers.remove(player);
+        this.removeDisconnected(player);
         player.sendToThis("[--PLAYER LIST--]");
         player.sendToThis(this.playerList());
         player.sendToThis("[--LOBBY SETTINGS--]");
@@ -98,7 +100,26 @@ public class Lobby implements Runnable {
         (new Thread(playerConnectionHandler)).start();
         this.sendToAll(player.getName() + " re-joined the lobby.");
         player.reSetupPlayer(this, getPlayerWithLeastDices());
-        this.isWaiting = true;
+
+        if(this.hasStarted){
+            player.sendToThis("");
+            player.sendToThis("You will re-join the match the next cycle of turns.");
+            player.sendToThis("You will join with the same number of dices as the player with less dices (" + player.getDices().size() + ").");
+            player.sendToThis("");
+        }
+
+        if (!this.isFull() && !hasStarted()) {
+            this.sendToAll("Waiting for players (" + this.getNumberOfPlayers() + "/" + this.lobbySettings.getMaxPlayers() + ")");
+        }
+
+        if(startSent && !hasStarted){
+            host.sendToThis("Start the game? Y/N");
+        }
+
+        if (this.canStart() && !this.startSent && !this.hasStarted) {
+            this.host.ask("StartGame");
+            this.startSent = true;
+        }
     }
 
     public void leaveLobby(Player player) {
@@ -117,7 +138,13 @@ public class Lobby implements Runnable {
                 this.gameManager.stopWaiting();
             }
 
-            this.isWaiting = true;
+            if (!this.isFull() && !hasStarted()) {
+                this.sendToAll("Waiting for players (" + this.getNumberOfPlayers() + "/" + this.lobbySettings.getMaxPlayers() + ")");
+            }
+
+            if(startSent && !hasStarted){
+                host.sendToThis("Start the game? Y/N");
+            }
         }
         catch(IOException ignored){}
     }
@@ -201,6 +228,20 @@ public class Lobby implements Runnable {
                     this.leaveLobby(p);
                 }
             }
+        }
+    }
+    public void removeDisconnected(Player player){
+        Player toRemove = null;
+        if(!disconnectedPlayers.isEmpty()){
+            for(Player p : disconnectedPlayers){
+                if(p.getName().equals(player.getName())){
+                    toRemove = p;
+                }
+            }
+        }
+
+        if(toRemove != null){
+            disconnectedPlayers.remove(toRemove);
         }
     }
     public String playerCount() {

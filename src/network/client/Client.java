@@ -3,7 +3,6 @@ package network.client;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import network.client.service.ClientMessageThread;
 import network.packets.action.ActionPacket;
@@ -11,6 +10,8 @@ import network.packets.settings.LobbySettingsPacket;
 import utils.input.In;
 
 public class Client implements Runnable {
+
+    //COMMANDS
     public static volatile boolean canSendNick = false;
     public static volatile boolean canCreateOrJoin = false;
     public static volatile boolean canSendLobbySettings = false;
@@ -21,6 +22,8 @@ public class Client implements Runnable {
     public static volatile boolean canSendNewBet = false;
     public static volatile boolean canSendSockIt = false;
 
+    //OTHER
+    public volatile boolean keepGoing = true;
     private static final Logger LOGGER = Logger.getLogger("Client");
     private final Socket client;
     private DataOutputStream outputStream;
@@ -33,11 +36,11 @@ public class Client implements Runnable {
     public void run() {
         try {
             outputStream = new DataOutputStream(this.client.getOutputStream());
-            ClientMessageThread clientMessageThread = new ClientMessageThread(this.client);
+            ClientMessageThread clientMessageThread = new ClientMessageThread(this.client, this);
 
             (new Thread(clientMessageThread)).start();
 
-            while(true) {
+            while(keepGoing) {
                 if(canSendNick){
                     canSendNick();
                 }
@@ -67,9 +70,7 @@ public class Client implements Runnable {
                 }
             }
         }
-        catch (Exception var10) {
-            LOGGER.log(Level.SEVERE, "Client Exception, closing client.");
-        }
+        catch (Exception ignored) {}
     }
 
     public void canSendNick() throws IOException {
@@ -90,6 +91,10 @@ public class Client implements Runnable {
         System.out.println("3. Update Lobby List");
 
         String choice = In.nextLine();
+
+        if(!keepGoing){
+            return;
+        }
 
         if (choice.equals("1")) {
 
@@ -129,6 +134,10 @@ public class Client implements Runnable {
 
             String choice = In.nextLine();
 
+            if(!keepGoing){
+                return;
+            }
+
             if (choice.equals("1")) {
                 isPublic = true;
                 break;
@@ -137,6 +146,11 @@ public class Client implements Runnable {
                 isPublic = false;
                 System.out.println("Type in the password for the lobby:");
                 password = In.nextLine();
+
+                if(!keepGoing){
+                    return;
+                }
+
                 break;
             }
             else{
@@ -150,6 +164,10 @@ public class Client implements Runnable {
         while(maxPlayers <= 1) {
             System.out.println("Set MAX number of Players in the lobby: (Default is 6, minimum is 2)");
             maxPlayers = In.nextInt();
+
+            if(!keepGoing){
+                return;
+            }
         }
 
         while(minPlayers <= 1) {
@@ -223,7 +241,6 @@ public class Client implements Runnable {
     public void canStartGame() throws IOException {
         canStartGame = false;
 
-        System.out.println("Start the game? Y/N");
         String choice = In.nextLine();
 
         if (!choice.equals("Y") && !choice.equals("y")) {
@@ -291,6 +308,7 @@ public class Client implements Runnable {
     public void canSendSockIt() throws IOException {
         canSendSockIt = false;
 
+        System.out.println();
         System.out.println("[--CALL SOCK IT--]");
         System.out.println("Calling Sock It checks if the last bet is PERFECT.");
         System.out.println("- If it is you get a dice (WIN).");
@@ -298,6 +316,7 @@ public class Client implements Runnable {
         System.out.println();
         System.out.println("1. Sock It");
         System.out.println("2. No");
+        System.out.println();
 
         String choice = In.nextLine();
 
@@ -307,5 +326,10 @@ public class Client implements Runnable {
         else {
             outputStream.writeUTF("sockIt:N");
         }
+    }
+
+    public void stop() throws IOException, InterruptedException {
+        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        keepGoing = false;
     }
 }

@@ -35,8 +35,12 @@ public class GameManager implements Runnable {
         this.lobby.sendToAll("");
 
         while(true) {
-            for(int i = 0; i<lobby.getPlayers().size(); i++) {
-                Player player = lobby.getPlayers().get(i);
+
+            LinkedList<Player> players = lobby.getPlayers();
+            System.out.println("Players: " + players.size());
+
+            for(int i = 0; i<players.size(); i++) {
+                Player player = players.get(i);
                 try {
                     if (player.hasDices()) {
                         if (playersAlive == 1 || this.lobby.getPlayers().size() == 1) {
@@ -57,8 +61,6 @@ public class GameManager implements Runnable {
                             this.hasFinished = true;
                             return;
                         }
-
-
 
                         this.lobby.sendToAll("Turn of " + player.getName() + ", they have " + player.getDices().size() + " dices left.");
                         this.lobby.sendToAll("");

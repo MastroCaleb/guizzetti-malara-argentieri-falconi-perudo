@@ -28,7 +28,6 @@ public class Main{
         }
         else{
             startPerudo();
-            System.out.println("Program has ended, please type 'exit' to close the console");
             new ProcessBuilder("cmd", "/c", "exit").inheritIO().start().waitFor();
         }
     }

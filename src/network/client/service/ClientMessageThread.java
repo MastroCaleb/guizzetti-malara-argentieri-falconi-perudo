@@ -3,13 +3,16 @@ package network.client.service;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
+
+import main.Main;
 import network.client.Client;
 
 public class ClientMessageThread implements Runnable {
     private final Socket client;
-
-    public ClientMessageThread(Socket client) {
+    private final Client clientThread;
+    public ClientMessageThread(Socket client, Client clientThread) {
         this.client = client;
+        this.clientThread = clientThread;
     }
 
     @Override
@@ -56,19 +59,15 @@ public class ClientMessageThread implements Runnable {
             }
         }
         catch (IOException | InterruptedException var5) {
-            System.out.println("An error has occurred.");
-        }
-    }
-
-    public void startWaiting() throws InterruptedException {
-        synchronized(this) {
-            this.wait();
-        }
-    }
-
-    public void stopWaiting() {
-        synchronized(this) {
-            this.notify();
+            System.out.println("The server encountered problems and shut down.");
+            try {
+                client.close();
+                clientThread.stop();
+                Main.main(new String[0]);
+            }
+            catch (IOException | InterruptedException e) {
+                System.out.println("Error has occurred.");
+            }
         }
     }
 }
