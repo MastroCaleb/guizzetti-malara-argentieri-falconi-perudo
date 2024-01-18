@@ -71,7 +71,7 @@ public class Player {
         StringBuilder value = new StringBuilder();
         int times = 1;
 
-        for(Dice dice : dices) {
+        for(Dice ignored : dices) {
             if (times == dices.size()) {
                 value.append("?");
             }

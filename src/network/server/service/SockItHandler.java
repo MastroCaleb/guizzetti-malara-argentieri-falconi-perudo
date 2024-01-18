@@ -5,8 +5,6 @@ import network.game.player.Player;
 import utils.logger.Logger;
 import utils.logger.LoggerLevel;
 
-import java.io.IOException;
-
 public class SockItHandler implements Runnable{
 
     private final Logger LOGGER;

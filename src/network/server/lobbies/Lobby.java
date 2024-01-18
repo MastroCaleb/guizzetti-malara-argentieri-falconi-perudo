@@ -5,7 +5,6 @@ import network.game.player.Player;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.logging.Level;
 
 import network.server.Server;
 import network.server.lobbies.settings.LobbySettings;

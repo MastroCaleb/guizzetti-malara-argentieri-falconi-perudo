@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Dice {
     private int value;
-    private boolean jollies = false;
+    private final boolean jollies;
 
     public Dice(boolean jollies) {
         this.jollies = jollies;

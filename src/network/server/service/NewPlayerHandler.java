@@ -3,7 +3,6 @@ package network.server.service;
 import network.game.player.Player;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.logging.Level;
 import network.server.Server;
 import network.server.lobbies.Lobby;
 import network.server.lobbies.settings.LobbySettings;
