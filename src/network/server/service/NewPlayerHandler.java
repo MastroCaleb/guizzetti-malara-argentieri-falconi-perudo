@@ -118,6 +118,9 @@ public class NewPlayerHandler implements Runnable {
                             this.player.sendToThis("Connecting to this lobby...");
                             lobby.joinLobby(this.player);
                         }
+                        else if(lobby.hasStarted()){
+                            this.player.sendToThis("This lobby has already started a game, can't join now.");
+                        }
                         else if (lobby.wasDisconnected(player)) {
                             this.player.sendToThis("Reconnecting to this lobby...");
                             lobby.reJoinLobby(this.player);

@@ -1,6 +1,5 @@
 package network.game.player;
 
-import main.Main;
 import network.game.dice.Dice;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -103,26 +102,6 @@ public class Player {
         return value.toString();
     }
 
-    /**
-     * @return The list of dices as a String, but the values are hidden with a "?".
-     */
-    public String getHiddenStringDices(){
-        StringBuilder value = new StringBuilder();
-        int times = 1;
-
-        for(Dice ignored : dices) {
-            if (times == dices.size()) {
-                value.append("?");
-            }
-            else {
-                value.append("?").append(" | ");
-            }
-            times++;
-        }
-
-        return value.toString();
-    }
-
     public String getName() {
         return this.name;
     }
@@ -158,7 +137,6 @@ public class Player {
 
     /**
      * Cleans the player's console (works only if the OS's terminal is open.)
-     * @throws IOException
      */
     public void clean() throws IOException {
         ask("Clean");

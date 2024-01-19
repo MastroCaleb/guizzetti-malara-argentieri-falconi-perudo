@@ -41,7 +41,7 @@ public class Lobby implements Runnable {
 
                 //If the game has started and game manager is null we start a new game.
                 if (this.hasStarted && this.gameManager == null) {
-                    //We setup every player.
+                    //We set up every player.
                     for(Player player : players){
                         player.removeAllDices();
                         player.setupPlayer(this);
@@ -60,6 +60,8 @@ public class Lobby implements Runnable {
                     this.hasStarted = false;
                     this.startSent = false;
                     this.gameManager = null;
+
+                    //We ask to restart the game.
                     host.ask("StartGame");
                     this.startSent = true;
                 }
@@ -215,7 +217,6 @@ public class Lobby implements Runnable {
     /**
      * @return If the game already started.
      */
-    @SuppressWarnings("all")
     public boolean hasStarted() {
         return this.hasStarted;
     }
@@ -312,26 +313,28 @@ public class Lobby implements Runnable {
         }
     }
 
-    /**
-     * Sends a message to all players except a specified one.
-     * @param message The contents of the message.
-     * @param except The player excluded from receiving the message.
-     */
-    public void sendToAllExcept(String message, Player except) {
-        if (!this.players.isEmpty()) {
-            for(Player p : players) {
-                if(!p.equals(except)){
-                    try{
-                        DataOutputStream outputStream = new DataOutputStream(p.getClient().getOutputStream());
-                        outputStream.writeUTF(message);
-                    }
-                    catch(IOException e){
-                        this.leaveLobby(p);
-                    }
-                }
-            }
-        }
-    }
+// --Commented out by Inspection START (19/01/2024 12:38):
+//    /**
+//     * Sends a message to all players except a specified one.
+//     * @param message The contents of the message.
+//     * @param except The player excluded from receiving the message.
+//     */
+//    public void sendToAllExcept(String message, Player except) {
+//        if (!this.players.isEmpty()) {
+//            for(Player p : players) {
+//                if(!p.equals(except)){
+//                    try{
+//                        DataOutputStream outputStream = new DataOutputStream(p.getClient().getOutputStream());
+//                        outputStream.writeUTF(message);
+//                    }
+//                    catch(IOException e){
+//                        this.leaveLobby(p);
+//                    }
+//                }
+//            }
+//        }
+//    }
+// --Commented out by Inspection STOP (19/01/2024 12:38)
 
     /**
      * Removes from the disconnected list a player that reconnected.

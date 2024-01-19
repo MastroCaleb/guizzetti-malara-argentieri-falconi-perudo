@@ -99,20 +99,17 @@ public class Client implements Runnable {
             return;
         }
 
-        if (choice.equals("1")) {
+        switch (choice) {
+            case "1" -> outputStream.writeUTF("createLobby");
+            case "2" -> {
+                System.out.println();
+                System.out.println("Type the code of the lobby you want to join: ");
 
-            outputStream.writeUTF("createLobby");
-        }
-        else if (choice.equals("2")) {
-            System.out.println();
-            System.out.println("Type the code of the lobby you want to join: ");
+                String code = In.nextLine();
 
-            String code = In.nextLine();
-
-            outputStream.writeUTF("joinLobby:" + code);
-        }
-        else if (choice.equals("3")){
-            outputStream.writeUTF("updateLobby");
+                outputStream.writeUTF("joinLobby:" + code);
+            }
+            case "3" -> outputStream.writeUTF("updateLobby");
         }
     }
 
@@ -290,14 +287,6 @@ public class Client implements Runnable {
 
             if(diceValue.equals("J")){
                 diceValue = "1";
-            }
-            else{
-                try{
-                    int diceV = Integer.parseInt(diceValue);
-                }
-                catch(NumberFormatException e){
-                    diceValue = "0";
-                }
             }
 
             outputStream.writeUTF("diceValue:" + diceValue);

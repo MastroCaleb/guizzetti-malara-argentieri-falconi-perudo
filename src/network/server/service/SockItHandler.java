@@ -36,12 +36,12 @@ public class SockItHandler implements Runnable{
                         if(data.equals("Y")){
                             this.player.sendToThis("You called sock it.");
                             this.gameManager.setSockIt(player);
-                            return;
                         }
                         else{
                             this.player.sendToThis("You didn't call sock it.");
-                            return;
                         }
+
+                        return;
                     }
                 }
             }

@@ -17,8 +17,8 @@ import utils.logger.LoggerLevel;
 public class Server implements Runnable {
     private final Logger LOGGER = new Logger("MainServer");
     private final ServerSocket serverSocket; //The server's socket.
-    public static LinkedList<Player> players = new LinkedList<Player>(); //List of all players.
-    public static LinkedList<Lobby> lobbies = new LinkedList<Lobby>(); //List of all lobbies.
+    public final static LinkedList<Player> players = new LinkedList<>(); //List of all players.
+    public final static LinkedList<Lobby> lobbies = new LinkedList<>(); //List of all lobbies.
 
     public Server(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
@@ -28,7 +28,7 @@ public class Server implements Runnable {
     public void run() {
         System.out.println("Server Started");
         try{
-            while(true) {
+            while(!serverSocket.isClosed()) {
                 Socket client = this.serverSocket.accept(); //Accept new client connection.
 
                 this.LOGGER.log(LoggerLevel.INFO, "A new Client connected. Creating a new Player instance.");

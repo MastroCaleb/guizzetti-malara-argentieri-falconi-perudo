@@ -30,40 +30,24 @@ public class ClientMessageThread implements Runnable {
 
                 //This switch statement checks for commands from the server, if no command was found then we just simply print out the message.
                 switch (message) {
-                    case "askNickname" -> {
-                        Client.canSendNick = true;
-                    }
-                    case "askCreateOrJoinLobby" -> {
-                        Client.canCreateOrJoin = true;
-                    }
-                    case "askLobbySettings" -> {
-                        Client.canSendLobbySettings = true;
-                    }
-                    case "askForPassword" -> {
-                        Client.canSendPassword = true;
-                    }
+                    case "askNickname" -> Client.canSendNick = true;
+                    case "askCreateOrJoinLobby" -> Client.canCreateOrJoin = true;
+                    case "askLobbySettings" -> Client.canSendLobbySettings = true;
+                    case "askForPassword" -> Client.canSendPassword = true;
                     case "askStartGame" -> {
-                        System.out.println("Minimum number of players reached.");
+                        System.out.println("Minimum number of players reached to start the game.");
                         Client.canStartGame = true;
                     }
-                    case "askStartBet" -> {
-                        Client.canStartBet = true;
-                    }
-                    case "askAction" -> {
-                        Client.canSendAction = true;
-                    }
-                    case "askNewBet"  -> {
-                        Client.canSendNewBet = true;
-                    }
-                    case "askForSockIt"  -> {
-                        Client.canSendSockIt = true;
-                    }
+                    case "askStartBet" -> Client.canStartBet = true;
+                    case "askAction" -> Client.canSendAction = true;
+                    case "askNewBet"  -> Client.canSendNewBet = true;
+                    case "askForSockIt"  -> Client.canSendSockIt = true;
                     case "askClean" -> {
                         if(Main.isConsole()){
                             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor(); //Cleans the OS's terminal
                         }
                     }
-                    default -> {System.out.println(message);}
+                    default -> System.out.println(message);
                 }
             }
         }

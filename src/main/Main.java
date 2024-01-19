@@ -39,6 +39,7 @@ public class Main{
      */
     private static void startPerudo(){
         try {
+            label:
             while(true) {
                 System.out.println("[---START MENU---]");
                 System.out.println();
@@ -48,26 +49,27 @@ public class Main{
 
                 String choice = In.nextLine();
 
-                if (choice.equals("1")) {
-                    System.out.println("Enter the port on which to open the server: ");
-                    int port = In.nextInt();
+                switch (choice) {
+                    case "1": {
+                        System.out.println("Enter the port on which to open the server: ");
+                        int port = In.nextInt();
 
-                    (new Thread(new Server(port))).start();
-                    break;
-                }
-                else if (choice.equals("2")) {
+                        (new Thread(new Server(port))).start();
+                        break label;
+                    }
+                    case "2": {
 
-                    System.out.println("Enter the IP of the server: ");
-                    String ip = In.nextLine();
+                        System.out.println("Enter the IP of the server: ");
+                        String ip = In.nextLine();
 
-                    System.out.println("Enter the port of the server: ");
-                    int port = In.nextInt();
+                        System.out.println("Enter the port of the server: ");
+                        int port = In.nextInt();
 
-                    (new Thread(new Client(ip, port))).start();
-                    break;
-                }
-                else if (choice.equals("3")) {
-                    break;
+                        (new Thread(new Client(ip, port))).start();
+                        break label;
+                    }
+                    case "3":
+                        break label;
                 }
             }
         }
