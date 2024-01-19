@@ -2,6 +2,9 @@ package network.packets.settings;
 
 import network.packets.Packet;
 
+/**
+ * Packet that contains a lobby's settings.
+ */
 @SuppressWarnings("all")
 public class LobbySettingsPacket extends Packet {
     private final boolean isPublic;

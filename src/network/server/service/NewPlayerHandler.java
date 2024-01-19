@@ -9,6 +9,10 @@ import network.server.lobbies.settings.LobbySettings;
 import utils.logger.Logger;
 import utils.logger.LoggerLevel;
 
+/**
+ * This handles a Player that just connected to the server.
+ * This manages reconnections and joining/creating lobbies.
+ */
 public class NewPlayerHandler implements Runnable {
     private final Logger LOGGER = new Logger("NewPlayerHandler");
     private Player player;
@@ -23,6 +27,7 @@ public class NewPlayerHandler implements Runnable {
             while(true) {
                 DataInputStream inputStream = new DataInputStream(this.player.getClient().getInputStream());
 
+                //Ask the player for it's username
                 while(this.player.getName().isEmpty()) {
                     player.ask("Nickname");
 
@@ -37,12 +42,18 @@ public class NewPlayerHandler implements Runnable {
                     }
                 }
 
+                player.clean();
+
+                this.LOGGER.log(LoggerLevel.INFO, player.getName() + " has connected to the server.");
+
+                Server.players.add(player);
+
+                //Check for past disconnections
                 Lobby disconnectedLobby = wasDisconnectedFromLobby(player);
 
+                //Manage the disconnection.
                 if(disconnectedLobby != null){
                     this.LOGGER.log(LoggerLevel.INFO, "Found reconnection of " + this.player.getName() + ".");
-
-                    player.clean();
 
                     player.sendToThis("[--RECONNECT TO LOBBY--]");
                     player.sendToThis("");
@@ -60,16 +71,11 @@ public class NewPlayerHandler implements Runnable {
                     }
                 }
 
-                player.clean();
-
-                this.LOGGER.log(LoggerLevel.INFO, player.getName() + " has connected to the server.");
-
-                Server.players.add(player);
-
                 this.player.sendToThis("");
                 this.player.sendToThis(Server.getLobbyList());
                 this.player.sendToThis("");
 
+                //Ask to create or join a lobby.
                 this.player.ask("CreateOrJoinLobby");
 
                 String createOrJoin = inputStream.readUTF();
@@ -159,6 +165,11 @@ public class NewPlayerHandler implements Runnable {
         }
     }
 
+    /**
+     * Checks if there is still a lobby from which the player disconnected
+     * @param player The player that just connected.
+     * @return Null if the player never connected to an existing lobby. Otherwise, the instance of the lobby the player can to reconnect to.
+     */
     public Lobby wasDisconnectedFromLobby(Player player){
         for (Lobby lobby : Server.lobbies){
             if(lobby.wasDisconnected(player)){

@@ -8,9 +8,9 @@ import network.server.Server;
 import utils.input.In;
 
 public class Main{
-    public static String filename = "";
+    public static String filename = ""; //The file position of this application's ".jar"
     public static void main(String[] args) throws IOException, InterruptedException {
-        filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
+        filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6); //Obtain the ".jar" position.
         if(isConsole()){
             openConsole();
         }
@@ -19,6 +19,10 @@ public class Main{
         }
     }
 
+    /**
+     * This opens the OS's terminal and runs this program on it instead of the IDE's terminal.
+     * This means that we can actually build an Executable Jar.
+     */
     private static void openConsole() throws IOException, InterruptedException {
         Console console = System.console();
         if(console == null && !GraphicsEnvironment.isHeadless()){
@@ -30,6 +34,9 @@ public class Main{
         }
     }
 
+    /**
+     * Starts the program.
+     */
     private static void startPerudo(){
         try {
             while(true) {
@@ -67,6 +74,9 @@ public class Main{
         catch (Exception ignored) {}
     }
 
+    /**
+     * @return The array of commands to use based on which Operating System this is being run on.
+     */
     private static String[] getConsoleCommand(String filename){
         String os = System.getProperty("os.name");
 
@@ -78,6 +88,9 @@ public class Main{
         }
     }
 
+    /**
+     * @return True if the ".jar" was found, we can open a terminal. False if this program is run on an IDE's terminal.
+     */
     public static boolean isConsole(){
         return filename.contains(".jar");
     }

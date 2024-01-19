@@ -5,9 +5,13 @@ import java.io.IOException;
 import java.net.Socket;
 import network.client.service.ClientMessageThread;
 import network.packets.action.ActionPacket;
+import network.packets.bet.BetPacket;
 import network.packets.settings.LobbySettingsPacket;
 import utils.input.In;
 
+/**
+ * This is the main class of the Client. We manage the Player's actions here.
+ */
 public class Client implements Runnable {
 
     //COMMANDS
@@ -38,6 +42,7 @@ public class Client implements Runnable {
 
             (new Thread(clientMessageThread)).start();
 
+            //This executes the commands given by the server.
             while(keepGoing) {
                 if(canSendNick){
                     canSendNick();
@@ -257,7 +262,9 @@ public class Client implements Runnable {
         System.out.println("Insert the dice number of the bet: ");
         int diceNumber = In.nextInt();
 
-        outputStream.writeUTF("startBet:" + "diceValue:" + diceValue + ";" + "diceNumber:" + diceNumber);
+        BetPacket betPacket = new BetPacket(diceValue, diceNumber);
+
+        outputStream.writeUTF("startBet:" + betPacket.write());
     }
 
     public void canSendAction() throws IOException {

@@ -5,11 +5,14 @@ import network.game.player.Player;
 import utils.logger.Logger;
 import utils.logger.LoggerLevel;
 
+/**
+ * Manages if a player wants to call sock it or not.
+ */
 public class SockItHandler implements Runnable{
 
     private final Logger LOGGER;
-    private final Player player;
-    private final GameManager gameManager;
+    private final Player player; //The instance of the player.
+    private final GameManager gameManager; //The game the player is in.
 
     public SockItHandler(Player player, GameManager gameManager){
         this.player = player;
@@ -19,8 +22,9 @@ public class SockItHandler implements Runnable{
     @Override
     public void run(){
         try{
-            this.player.sendToThis("askForSockIt");
+            //Send the packet and manage the response.
             while(!player.getClient().isClosed()){
+                this.player.ask("ForSockIt");
 
                 String interaction = player.getPlayerInteraction();
 
@@ -43,6 +47,7 @@ public class SockItHandler implements Runnable{
             }
         }
         catch (Exception e){
+            //Player disconnected, leave this lobby.
             LOGGER.log(LoggerLevel.ERROR, "An Exception was found. Disconnecting " + player.getName() + " from server.");
             this.gameManager.getLobby().leaveLobby(player);
         }

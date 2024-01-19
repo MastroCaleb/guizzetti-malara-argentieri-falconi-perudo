@@ -11,11 +11,14 @@ import network.server.service.NewPlayerHandler;
 import utils.logger.Logger;
 import utils.logger.LoggerLevel;
 
+/**
+ * Main class of the Server. This manages new Clients.
+ */
 public class Server implements Runnable {
     private final Logger LOGGER = new Logger("MainServer");
-    private final ServerSocket serverSocket;
-    public static LinkedList<Player> players = new LinkedList<Player>();
-    public static LinkedList<Lobby> lobbies = new LinkedList<Lobby>();
+    private final ServerSocket serverSocket; //The server's socket.
+    public static LinkedList<Player> players = new LinkedList<Player>(); //List of all players.
+    public static LinkedList<Lobby> lobbies = new LinkedList<Lobby>(); //List of all lobbies.
 
     public Server(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
@@ -26,12 +29,12 @@ public class Server implements Runnable {
         System.out.println("Server Started");
         try{
             while(true) {
-                Socket client = this.serverSocket.accept();
+                Socket client = this.serverSocket.accept(); //Accept new client connection.
 
                 this.LOGGER.log(LoggerLevel.INFO, "A new Client connected. Creating a new Player instance.");
 
                 Player player = new Player("", client);
-                (new Thread(new NewPlayerHandler(player))).start();
+                (new Thread(new NewPlayerHandler(player))).start(); //Start to handle the new player.
             }
         }
         catch (IOException e) {
@@ -39,6 +42,10 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * @param name The name the player wants to use.
+     * @return True if the name is already in use. False if not.
+     */
     public static boolean nickIsUsed(String name){
         if(players.isEmpty()){
             return false;
@@ -53,6 +60,10 @@ public class Server implements Runnable {
         return false;
     }
 
+    /**
+     * @param code The code of the lobby.
+     * @return An instance of a lobby if found. Null if no lobby was found.
+     */
     public static Lobby getLobbyFromCode(String code) {
         Lobby lobbyFound = null;
 
@@ -65,6 +76,9 @@ public class Server implements Runnable {
         return lobbyFound;
     }
 
+    /**
+     * @return A list of all public lobbies in String form.
+     */
     public static String getLobbyList() {
         if (lobbies.isEmpty()) {
             return "No public lobbies available.";
@@ -88,6 +102,9 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * @return A new lobby code that isn't used.
+     */
     public static String getRandomCode() {
         String code = String.valueOf((new Random()).nextInt(10000, 100000));
         if (!lobbies.isEmpty()) {

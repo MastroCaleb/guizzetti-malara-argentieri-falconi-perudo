@@ -12,15 +12,18 @@ import network.server.service.PlayerConnectionHandler;
 import utils.logger.Logger;
 import utils.logger.LoggerLevel;
 
+/**
+ * This class manages a Thread of a Lobby.
+ */
 public class Lobby implements Runnable {
-    private final LobbySettings lobbySettings;
+    private final LobbySettings lobbySettings; //This lobby's settings.
     private final Logger LOGGER;
-    private final LinkedList<Player> players = new LinkedList<>();
-    private final LinkedList<Player> disconnectedPlayers = new LinkedList<>();
-    private volatile boolean startSent = false;
-    private volatile boolean hasStarted = false;
-    private Player host;
-    private GameManager gameManager;
+    private final LinkedList<Player> players = new LinkedList<>(); //The players inside this lobby.
+    private final LinkedList<Player> disconnectedPlayers = new LinkedList<>(); //The players that disconnected from this lobby.
+    private volatile boolean startSent = false; //If the lobby asked to start the game.
+    private volatile boolean hasStarted = false; //If the game has started.
+    private Player host; //The host of the lobby, the player that created it.
+    private GameManager gameManager; //If null the game hasn't started. Otherwise, it contains the current game's instance.
 
     public Lobby(Player host, LobbySettings lobbySettings) {
         this.host = host;
@@ -36,17 +39,22 @@ public class Lobby implements Runnable {
                     LOGGER.log(LoggerLevel.INFO, "This lobby is full.");
                 }
 
+                //If the game has started and game manager is null we start a new game.
                 if (this.hasStarted && this.gameManager == null) {
+                    //We setup every player.
                     for(Player player : players){
                         player.removeAllDices();
                         player.setupPlayer(this);
                     }
+
                     clearAllPlayers();
+
                     LOGGER.log(LoggerLevel.INFO, "A Game has started.");
                     this.gameManager = new GameManager(this);
 
-                    (new Thread(this.gameManager)).start();
+                    (new Thread(this.gameManager)).start(); //Start new game.
                 }
+                //If the game has started, the manager isn't null and the game ended we make gameManager null and reset the booleans.
                 else if (this.hasStarted && this.gameManager != null && this.gameManager.hasFinished()) {
                     LOGGER.log(LoggerLevel.INFO, "A Game has ended.");
                     this.hasStarted = false;
@@ -54,6 +62,7 @@ public class Lobby implements Runnable {
                     this.gameManager = null;
                 }
 
+                //If there's no players left in the lobby we close it.
                 if(this.players.isEmpty()){
                     LOGGER.log(LoggerLevel.WARNING, "This lobby was found empty. Closing the lobby.");
                     Server.lobbies.remove(this);
@@ -67,6 +76,10 @@ public class Lobby implements Runnable {
         }
     }
 
+    /**
+     * Makes a player join this lobby.
+     * @param player The player that has to join.
+     */
     public void joinLobby(Player player) throws IOException {
         player.clean();
         this.players.add(player);
@@ -93,6 +106,10 @@ public class Lobby implements Runnable {
         }
     }
 
+    /**
+     * If the player disconnected we make him reconnect with this method.
+     * @param player The player that needs to reconnect.
+     */
     public void reJoinLobby(Player player) throws IOException {
         player.clean();
         this.players.add(player);
@@ -127,6 +144,10 @@ public class Lobby implements Runnable {
         }
     }
 
+    /**
+     * Makes a player leave this lobby.
+     * @param player The player that has to leave.
+     */
     public void leaveLobby(Player player) {
         try{
             player.getClient().close();
@@ -154,6 +175,9 @@ public class Lobby implements Runnable {
         catch(IOException ignored){}
     }
 
+    /**
+     * @return Gets the least number of dices in a player that is still playing.
+     */
     public int getPlayerWithLeastDices(){
         int min = players.get(0).getDices().size();
         for(Player player : players){
@@ -164,19 +188,40 @@ public class Lobby implements Runnable {
 
         return min;
     }
+
+    /**
+     * @return The total number of players connected.
+     */
     public int getNumberOfPlayers() {
         return this.players.size();
     }
+
+    /**
+     * @return If the lobby is full or not.
+     */
     public boolean isFull() {
         return this.lobbySettings.getMaxPlayers() <= this.players.size();
     }
+
+    /**
+     * @return If the lobby is ready to start the game.
+     */
     public boolean canStart() {
         return this.getNumberOfPlayers() >= this.lobbySettings.getMinPlayers();
     }
+
+    /**
+     * @return If the game already started.
+     */
     @SuppressWarnings("all")
     public boolean hasStarted() {
         return this.hasStarted;
     }
+
+    /**
+     * @param player The player we need to check.
+     * @return If this player was disconnected from the lobby.
+     */
     public boolean wasDisconnected(Player player) {
         for(Player p : disconnectedPlayers){
             if(p.getName().equals(player.getName())){
@@ -185,6 +230,10 @@ public class Lobby implements Runnable {
         }
         return false;
     }
+
+    /**
+     * @return The list of players in a String.
+     */
     public String playerList() {
         StringBuilder playerList = new StringBuilder();
         playerList.append("Player List (").append(this.getNumberOfPlayers()).append(") of Lobby with code ").append(lobbySettings.getLobbyCode()).append(": \n");
@@ -205,26 +254,48 @@ public class Lobby implements Runnable {
 
         return playerList.toString();
     }
+
+    /**
+     * @return The list of players currently connected.
+     */
     public LinkedList<Player> getPlayers() {
         return this.players;
     }
+
+    /**
+     * @return The list of players that disconnected.
+     */
     public LinkedList<Player> getDisconnectedPlayers() {
         return disconnectedPlayers;
     }
+
     public void setHasStarted(boolean hasStarted) {
         this.hasStarted = hasStarted;
     }
     public void setStartSent(boolean startSent) {
         this.startSent = startSent;
     }
+
+    /**
+     * @return The game manager of the lobby.
+     */
     public GameManager getGameManager() {
         return this.gameManager;
     }
+
+    /**
+     * Clears all player's OS's console.
+     */
     public void clearAllPlayers() throws IOException {
         for (Player player : players){
-            player.ask("Clean");
+            player.clean();
         }
     }
+
+    /**
+     * Sends a message to all players.
+     * @param message The contents of the message.
+     */
     public void sendToAll(String message) {
         if (!this.players.isEmpty()) {
             for(Player p : players) {
@@ -238,6 +309,12 @@ public class Lobby implements Runnable {
             }
         }
     }
+
+    /**
+     * Sends a message to all players except a specified one.
+     * @param message The contents of the message.
+     * @param except The player excluded from receiving the message.
+     */
     public void sendToAllExcept(String message, Player except) {
         if (!this.players.isEmpty()) {
             for(Player p : players) {
@@ -253,6 +330,11 @@ public class Lobby implements Runnable {
             }
         }
     }
+
+    /**
+     * Removes from the disconnected list a player that reconnected.
+     * @param player The player that reconnected.
+     */
     public void removeDisconnected(Player player){
         Player toRemove = null;
         if(!disconnectedPlayers.isEmpty()){
@@ -267,9 +349,14 @@ public class Lobby implements Runnable {
             disconnectedPlayers.remove(toRemove);
         }
     }
+
+    /**
+     * @return The total count of players but in String form.
+     */
     public String playerCount() {
         return "(" + this.players.size() + "/" + this.lobbySettings.getMaxPlayers() + ")";
     }
+
     public String getCode() {
         return this.lobbySettings.getLobbyCode();
     }

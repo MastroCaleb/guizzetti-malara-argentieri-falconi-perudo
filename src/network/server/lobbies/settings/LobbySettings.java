@@ -4,6 +4,9 @@ import network.packets.Packet;
 
 import java.lang.reflect.Field;
 
+/**
+ * Class that contains each lobby's settings.
+ */
 @SuppressWarnings("all")
 public class LobbySettings extends Packet {
     private String lobbyCode = "";

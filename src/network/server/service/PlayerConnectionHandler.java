@@ -8,10 +8,13 @@ import network.server.lobbies.Lobby;
 import utils.logger.Logger;
 import utils.logger.LoggerLevel;
 
+/**
+ * This manages the connection of the player to the lobby.
+ */
 public class PlayerConnectionHandler implements Runnable {
     private final Logger LOGGER;
-    private final Lobby lobby;
-    private final Player player;
+    private final Lobby lobby; //The lobby the player is in.
+    private final Player player; //The instance of the player.
 
     public PlayerConnectionHandler(Lobby lobby, Player player) {
         this.lobby = lobby;
@@ -26,6 +29,8 @@ public class PlayerConnectionHandler implements Runnable {
                 try {
                     DataInputStream inputStream = new DataInputStream(this.player.getClient().getInputStream());
                     String message = inputStream.readUTF();
+
+                    //Receive the player's packets and manage them.
 
                     if (message.equals("canStart")) {
                         if(this.lobby.canStart()){
@@ -70,9 +75,11 @@ public class PlayerConnectionHandler implements Runnable {
                 }
             }
 
+            //Player disconnected, leave this lobby.
             this.lobby.leaveLobby(this.player);
         }
         catch (Exception e) {
+            //Player disconnected, leave this lobby.
             LOGGER.log(LoggerLevel.ERROR, "Encountered an Exception. Disconnecting " + player.getName() + " from the server.");
             this.lobby.leaveLobby(this.player);
         }

@@ -3,6 +3,7 @@ package network.game.manager;
 import network.game.bet.Bet;
 import network.game.dice.Dice;
 import network.game.player.Player;
+import network.packets.bet.BetPacket;
 import network.server.lobbies.Lobby;
 import network.server.service.SockItHandler;
 import utils.logger.Logger;
@@ -11,22 +12,24 @@ import utils.logger.LoggerLevel;
 import java.io.IOException;
 import java.util.LinkedList;
 
+/**
+ * This class manages the Game in a lobby.
+ */
 @SuppressWarnings("deprecation")
 public class GameManager implements Runnable {
-
     private final Logger LOGGER = new Logger("GameManager");
-    private Bet currentBet = null;
-    private int round = 1;
-    private final Lobby lobby;
-    private boolean hasFinished = false;
+    private Bet currentBet = null; //The last bet that was made. This is null if the game just started or a new Round started.
+    private int round = 1; //Number of rounds.
+    private final Lobby lobby; //The lobby that this game was started in.
+    private boolean hasFinished = false; //If the game has ended.
 
     //PALIFIC
-    private boolean palific = false;
-    private int palificRound = 0;
+    private boolean palific = false; //If there is a palific player.
+    private int palificRound = 0; //This regulates if diceValue can be changed (if there's a palific player it shouldn't be changed)
 
     //SOCK IT
-    private Player sockItUser = null;
-    private boolean sockIt = false;
+    private Player sockItUser = null; //The player that called Sock It.
+    private boolean sockIt = false; //If sock it was called or not.
 
     public GameManager(Lobby lobby) {
         this.lobby = lobby;
@@ -34,17 +37,20 @@ public class GameManager implements Runnable {
 
     @Override
     public void run() {
+        //We get how many players this game started with.
         int playersAlive = this.lobby.getPlayers().size();
         this.lobby.sendToAll("");
         this.lobby.sendToAll("Round " + this.round);
         this.lobby.sendToAll("");
 
+        //Start game.
         while(true) {
-
             for(int i = 0; i<lobby.getPlayers().size(); i++) {
-                Player player = lobby.getPlayers().get(i);
+                Player player = lobby.getPlayers().get(i); //Turn of this player.
                 try {
+                    //If this player has dices he can play, otherwise he is spectating.
                     if (player.hasDices()) {
+                        //If there's one player alive or the lobby only has one player left the game ends.
                         if (playersAlive == 1 || this.lobby.getPlayers().size() == 1) {
                             this.lobby.sendToAll("[--GAME HAS ENDED--]");
                             this.lobby.sendToAll("");
@@ -53,6 +59,8 @@ public class GameManager implements Runnable {
 
                             LinkedList<Player> losers = getLosers();
                             LinkedList<Player> disconnected = lobby.getDisconnectedPlayers();
+
+                            //We list every player that either lost or has disconnected (shame on them).
 
                             if(!losers.isEmpty()){
                                 this.lobby.sendToAll("[--LOSERS--]");
@@ -82,6 +90,7 @@ public class GameManager implements Runnable {
                         player.sendToThis(player.getName() + "'s Dices: " + player.getStringDices());
                         player.sendToThis("");
 
+                        //If the current bet is null we are at the start of the game or in a new round.
                         if (this.currentBet == null) {
                             while(!this.lobby.getPlayers().isEmpty()) {
                                 player.sendToThis("[--START BET--]");
@@ -91,24 +100,26 @@ public class GameManager implements Runnable {
 
                                 this.startWaiting();
 
-                                String choice = player.getPlayerInteraction();
+                                String interaction = player.getPlayerInteraction();
 
-                                if (choice == null) {
+                                //If interaction is null the player disconnected.
+                                if (interaction == null) {
                                     break;
                                 }
 
-                                String[] bet = choice.split(";");
+                                //We receive the packet and check if it is a usable bet.
                                 try{
-                                    String diceValue = bet[0].replace("diceValue:", "");
-                                    String diceNumber = bet[1].replace("diceNumber:", "");
+                                    BetPacket packet = new BetPacket(interaction);
 
-                                    if (this.setStartBet(player, Integer.parseInt(diceValue), Integer.parseInt(diceNumber))) {
+                                    //If it's usable we go to the next turn, if not we repeat the loop.
+                                    if (this.setStartBet(player, packet.getDiceValue(), packet.getDiceNumber())) {
                                         break;
                                     }
                                 }
-                                catch(ArrayIndexOutOfBoundsException ignored){}
+                                catch(NoSuchFieldException | IllegalAccessException ignored){} //Wrong packet received, let's restart the loop.
                             }
 
+                            //We show all players the new bet.
                             if(currentBet != null){
                                 this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.toString());
                             }
@@ -116,6 +127,7 @@ public class GameManager implements Runnable {
                         else {
                             this.lobby.sendToAll("Current Bet: " + this.currentBet);
 
+                            //Ask the player weather he wants to doubt or change the bet.
                             while(!this.lobby.getPlayers().isEmpty()) {
 
                                 player.sendToThis("[--DOUBT OR BET--]");
@@ -125,11 +137,13 @@ public class GameManager implements Runnable {
 
                                 player.ask("Action");
 
+                                //These threads handle the SockItHandlers of each player. But we start them only if the rule is set to true.
+
                                 LinkedList<Thread> handlers = new LinkedList<>();
 
                                 if(lobby.getSettings().canSockIt()){
                                     for(Player p : lobby.getPlayers()){
-                                        if(!p.equals(player)){
+                                        if(!p.equals(player) && p.hasDices()){
                                             Thread sockItHandler = new Thread(new SockItHandler(p, this));
                                             sockItHandler.start();
                                             handlers.add(sockItHandler);
@@ -141,6 +155,7 @@ public class GameManager implements Runnable {
 
                                 String choice = player.getPlayerInteraction();
 
+
                                 if(lobby.getSettings().canSockIt()){
                                     if(!sockIt){
                                         for(Thread thread : handlers){
@@ -148,32 +163,32 @@ public class GameManager implements Runnable {
                                         }
                                     }
                                     else {
+                                        //If someone called sock it, skip this player's turn.
                                         player.sendToThis("Someone called Sock It, so your bet was skipped.");
+                                        for(Thread thread : handlers){
+                                            thread.stop();
+                                        }
                                         break;
                                     }
                                 }
 
-
+                                //If choice is null the player disconnected.
                                 if (choice == null) {
                                     break;
                                 }
 
+                                //If players chooses 1 we call a doubt and check each player's dices.
                                 if (choice.equals("1")) {
                                     this.lobby.sendToAll("[--DOUBT--]");
                                     this.lobby.sendToAll("");
                                     this.lobby.sendToAll(player.getName() + " made a Doubt!");
                                     this.lobby.sendToAll(player.getName() + " doubts that there are " + this.currentBet.getDiceNumber() + " dices of value " + this.currentBet.getDiceValue() + ".");
 
-                                    boolean doubt = this.doubt();
+                                    boolean doubt = this.doubt(); //If true the doubt is won, if false it's lost.
 
                                     this.lobby.sendToAll("");
 
-                                    for(Player p : lobby.getPlayers()){
-                                        this.lobby.sendToAll("Dices of: " + p.getName());
-                                        this.lobby.sendToAll(p.getStringDices());
-                                        this.lobby.sendToAll("");
-                                    }
-
+                                    //If the doubt is lost we remove a dice from the player that called it.
                                     if (!doubt) {
                                         this.lobby.sendToAll("Doubt Lost. " + player.getName() + " lost a dice.");
 
@@ -196,6 +211,7 @@ public class GameManager implements Runnable {
                                             i--;
                                         }
                                     }
+                                    //If the doubt is won we remove a dice from the player that made the last bet.
                                     else {
                                         this.lobby.sendToAll("Doubt Won. " + this.currentBet.getPlayer().getName() + " lost a dice.");
 
@@ -224,6 +240,7 @@ public class GameManager implements Runnable {
 
                                     break;
                                 }
+                                //If choice is 2 we ask the player what he would like to change about the bet.
                                 else if (choice.equals("2")) {
                                     while(!this.lobby.getPlayers().isEmpty()) {
                                         player.sendToThis("[--NEW BET--]");
@@ -237,13 +254,17 @@ public class GameManager implements Runnable {
 
                                         String newBet = player.getPlayerInteraction();
 
+                                        //We check the changed dice value.
                                         if (newBet.contains("diceValue:")) {
+                                            //if the new dice value is a usable one we change the current bet and go to the next turn. Otherwise, we repeat the loop.
                                             if (this.setNewDiceValue(player, Integer.parseInt(newBet.replace("diceValue:", "")))) {
                                                 this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.toString());
                                                 break;
                                             }
                                         }
+                                        //We check the changed dice number.
                                         else if (newBet.contains("diceNumber:")) {
+                                            //if the new dice number is a usable one we change the current bet and go to the next turn. Otherwise, we repeat the loop.
                                             if(this.setNewDiceNumber(player, Integer.parseInt(newBet.replace("diceNumber:", "")))){
                                                 this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.toString());
                                                 break;
@@ -255,14 +276,16 @@ public class GameManager implements Runnable {
                                 player.sendToThis("Not a choice that you can make.");
                             }
 
+                            //If sock it was called and the player that made the sock it isn't null we continue.
                             if(sockIt && sockItUser !=  null) {
                                 this.lobby.sendToAll("");
                                 this.lobby.sendToAll("[--SOCK IT--]");
                                 this.lobby.sendToAll(sockItUser.getName() + " called a SOCK IT!");
                                 this.lobby.sendToAll("");
 
-                                boolean result = sockIt();
+                                boolean result = sockIt(); //If true the sock it is won. If false the sock it is lost.
 
+                                //If the player lost the sock it we remove a dice.
                                 if (!result) {
                                     this.lobby.sendToAll("Sock It Lost. " + player.getName() + " lost a dice.");
 
@@ -272,7 +295,8 @@ public class GameManager implements Runnable {
                                         this.lobby.sendToAll("");
                                         this.lobby.sendToAll(player.getName() + " lost the game.");
                                         playersAlive--;
-                                    } else {
+                                    }
+                                    else {
                                         this.lobby.sendToAll("");
                                         this.lobby.sendToAll("As " + player.getName() + " lost a dice, they start the next round.");
                                         if (player.getDices().size() == 1) {
@@ -283,7 +307,9 @@ public class GameManager implements Runnable {
                                         }
                                         i--;
                                     }
-                                } else {
+                                }
+                                //If the player won the sock it we add a dice.
+                                else {
                                     this.lobby.sendToAll("Sock It Won! " + player.getName() + " gained a dice!");
 
                                     player.addDice(lobby.getSettings().useJollies());
@@ -304,31 +330,54 @@ public class GameManager implements Runnable {
                 }
                 catch (InterruptedException e) {
                     LOGGER.log(LoggerLevel.ERROR, "The GameManager encountered a Thread error and is stopping.");
+                    return;
                 }
             }
         }
     }
 
+    /**
+     * @return True if the game ended. False if the game is still going.
+     */
     public boolean hasFinished() {
         return this.hasFinished;
     }
 
+    /**
+     * @return The lobby that the game is running on.
+     */
     public Lobby getLobby() {
         return lobby;
     }
 
+    /**
+     * Stops the thread temporarily.
+     *
+     * @throws InterruptedException
+     */
     public void startWaiting() throws InterruptedException {
         synchronized(this) {
             this.wait();
         }
     }
 
+    /**
+     * Restarts the thread after it stopped.
+     */
     public void stopWaiting() {
         synchronized(this) {
             this.notify();
         }
     }
 
+    /**
+     * This sets the start bet when the game starts or when a new round starts.
+     *
+     * @param player The player that made the bet.
+     * @param diceValue The dice value the player betted.
+     * @param diceNumber The dice number the player betted.
+     * @return True if the bet is usable. False if a condition isn't met.
+     */
     public boolean setStartBet(Player player, int diceValue, int diceNumber) throws IOException {
         if (diceValue >= 2 && diceValue <= 6) {
             if (diceNumber <= 0) {
@@ -346,6 +395,13 @@ public class GameManager implements Runnable {
         }
     }
 
+    /**
+     * Changes the current bet's dice value to a new one.
+     *
+     * @param player The player that made this change.
+     * @param newDiceValue The new dice value.
+     * @return True if the bet is usable. False if a condition isn't met.
+     */
     public boolean setNewDiceValue(Player player, int newDiceValue) throws IOException {
         int minDiceValue = minDiceValue();
         if (newDiceValue >= minDiceValue && newDiceValue <= 6 && ((this.lobby.getSettings().useJollies() && newDiceValue == 1) || newDiceValue > this.currentBet.getDiceValue()) && !palific) {
@@ -363,6 +419,13 @@ public class GameManager implements Runnable {
         }
     }
 
+    /**
+     * Changes the current bet's dice number to a new one.
+     *
+     * @param player The player that made this change.
+     * @param newDiceNumber The new dice number.
+     * @return True if the bet is usable. False if a condition isn't met.
+     */
     public boolean setNewDiceNumber(Player player, int newDiceNumber) throws IOException {
         int min = newDiceNumber == 1 ? this.currentBet.getDiceNumber()/2 : this.currentBet.getDiceNumber();
         if (newDiceNumber <= min) {
@@ -374,11 +437,17 @@ public class GameManager implements Runnable {
         }
     }
 
+    /**
+     * Makes a doubt.
+     *
+     * @return True if doubt is won. False if it's lost.
+     */
     public boolean doubt(){
         boolean value = false;
 
         int diceCount = countDices();
 
+        this.lobby.sendToAll("Dices on the table: ");
         showPlayerDices();
 
         if (this.currentBet.getDiceNumber() > diceCount) {
@@ -390,6 +459,12 @@ public class GameManager implements Runnable {
         this.lobby.sendToAll("");
         return value;
     }
+
+    /**
+     * Makes a sock it.
+     *
+     * @return True if sock it is won. False if it's lost.
+     */
     public boolean sockIt(){
         boolean value = false;
 
@@ -407,6 +482,9 @@ public class GameManager implements Runnable {
         return value;
     }
 
+    /**
+     * @return The number of dices in total that have the same dice value as the last bet.
+     */
     public int countDices(){
         int diceCount = 0;
         for(Player p: lobby.getPlayers()) {
@@ -419,6 +497,9 @@ public class GameManager implements Runnable {
         return diceCount;
     }
 
+    /**
+     * Shows all players dices.
+     */
     public void showPlayerDices() {
         for(Player player : lobby.getPlayers()){
             this.lobby.sendToAll(player.getName() + ": " + player.getStringDices());
@@ -426,6 +507,9 @@ public class GameManager implements Runnable {
         }
     }
 
+    /**
+     * Shows all players dices as "?", except for yours.
+     */
     public void showHiddenPlayerDices() throws IOException {
         for(Player player : lobby.getPlayers()){
             player.sendToThis(player.getName() + ": " + player.getStringDices());
@@ -434,6 +518,10 @@ public class GameManager implements Runnable {
         }
     }
 
+    /**
+     * Sets if someone called a Sock It and which player called it.
+     * @param player The player that called Sock It.
+     */
     public void setSockIt(Player player) {
         if(!sockIt){
             sockItUser = player;
@@ -441,6 +529,9 @@ public class GameManager implements Runnable {
         }
     }
 
+    /**
+     * @return Gets the number of dices of the player with the least dices that is still playing.
+     */
     public int minDiceValue(){
         if(this.lobby.getSettings().useJollies() && !palific){
             return 1;
@@ -450,12 +541,16 @@ public class GameManager implements Runnable {
         }
     }
 
+    /**
+     * Goes to next round.
+     */
     public void nextRound() throws IOException {
         this.currentBet = null;
         this.lobby.sendToAll("");
         this.lobby.sendToAll("RE-ROLLING ALL PLAYER'S DICES");
         this.lobby.sendToAll("");
 
+        //Roll all player dices.
         for(Player p : lobby.getPlayers()){
             p.rollAll();
         }
@@ -471,6 +566,9 @@ public class GameManager implements Runnable {
         this.lobby.sendToAll("Round " + this.round);
     }
 
+    /**
+     * @return The list of players that lost the game.
+     */
     public LinkedList<Player> getLosers(){
         LinkedList<Player> losers = new LinkedList<>();
 

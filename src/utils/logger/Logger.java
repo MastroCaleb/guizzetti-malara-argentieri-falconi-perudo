@@ -1,7 +1,9 @@
 package utils.logger;
 
+/**
+ * Custom Logger.
+ */
 public class Logger {
-
     private final String id;
 
     public Logger(String id){

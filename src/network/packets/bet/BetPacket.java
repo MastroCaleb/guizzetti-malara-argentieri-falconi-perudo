@@ -2,10 +2,16 @@ package network.packets.bet;
 
 import network.packets.Packet;
 
+/**
+ * Packet that contains a bet.
+ */
 public class BetPacket extends Packet {
-    private final int diceValue;
-    private final int diceNumber;
+    private int diceValue;
+    private int diceNumber;
 
+    public BetPacket(String packet) throws NoSuchFieldException, IllegalAccessException {
+        read(packet);
+    }
     public BetPacket(int diceValue, int diceNumber) {
         this.diceValue = diceValue;
         this.diceNumber = diceNumber;

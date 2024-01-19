@@ -9,6 +9,9 @@ import network.client.Client;
 import utils.logger.Logger;
 import utils.logger.LoggerLevel;
 
+/**
+ * This class manages the Server's packets that arrive to the client.
+ */
 public class ClientMessageThread implements Runnable {
     private final Logger LOGGER = new Logger("Client");
     private final Socket client;
@@ -25,6 +28,7 @@ public class ClientMessageThread implements Runnable {
                 DataInputStream inputStream = new DataInputStream(this.client.getInputStream());
                 String message = inputStream.readUTF();
 
+                //This switch statement checks for commands from the server, if no command was found then we just simply print out the message.
                 switch (message) {
                     case "askNickname" -> {
                         Client.canSendNick = true;
@@ -55,13 +59,16 @@ public class ClientMessageThread implements Runnable {
                         Client.canSendSockIt = true;
                     }
                     case "askClean" -> {
-                        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+                        if(Main.isConsole()){
+                            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor(); //Cleans the OS's terminal
+                        }
                     }
                     default -> {System.out.println(message);}
                 }
             }
         }
         catch (IOException | InterruptedException var5) {
+            //We handle the disconnection from the server after it shut down.
             LOGGER.log(LoggerLevel.WARNING, "The server shut down.");
             try {
                 client.close();

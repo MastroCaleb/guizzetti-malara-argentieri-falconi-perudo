@@ -6,16 +6,17 @@ import java.util.LinkedList;
 /**
  * This class contains methods to serialize/deserialize objects in/from strings
  */
+@SuppressWarnings("all")
 public class Serializer {
 
     /**
      * This method serializes each one of the object's field and value into a string.
-     *
+     * <p>
      * Example:
      * fieldName:fieldValue
      *
-     * @param object
-     * @param fields
+     * @param object The object we need to serialize.
+     * @param fields The object's fields.
      * @return Serialized object in a String value.
      */
     public static <T> String serializeObject(T object, Field[] fields) {
@@ -49,10 +50,8 @@ public class Serializer {
     /**
      * This method deserializes a String value into an Object.
      *
-     * @param object
-     * @param value
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
+     * @param object The object we need to deserialize.
+     * @param value The object in string form.
      */
     public static <T> void deserializeObject(T object, String value) throws NoSuchFieldException, IllegalAccessException {
         LinkedList<String> values = getValues(value, ';');
@@ -79,7 +78,7 @@ public class Serializer {
         return toObject(field.getType(), value);
     }
 
-    public static Object toObject(Class clazz, String value) {
+    private static Object toObject(Class clazz, String value) {
         if(Boolean.class == clazz || boolean.class == clazz) return Boolean.parseBoolean( value );
         if(Byte.class == clazz || byte.class == clazz) return Byte.parseByte( value );
         if(Short.class == clazz || short.class == clazz) return Short.parseShort( value );
