@@ -502,8 +502,10 @@ public class GameManager implements Runnable {
      */
     public void showPlayerDices() {
         for(Player player : lobby.getPlayers()){
-            this.lobby.sendToAll(player.getName() + ": " + player.getStringDices());
-            this.lobby.sendToAll("");
+            if(player.hasDices()){
+                this.lobby.sendToAll(player.getName() + ": " + player.getStringDices());
+                this.lobby.sendToAll("");
+            }
         }
     }
 
@@ -555,7 +557,7 @@ public class GameManager implements Runnable {
             p.rollAll();
         }
 
-        showHiddenPlayerDices();
+        //showHiddenPlayerDices();
 
         if(palific && palificRound!=round){
             palific = false;

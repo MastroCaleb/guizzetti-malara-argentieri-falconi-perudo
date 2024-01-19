@@ -60,6 +60,8 @@ public class Lobby implements Runnable {
                     this.hasStarted = false;
                     this.startSent = false;
                     this.gameManager = null;
+                    host.ask("StartGame");
+                    this.startSent = true;
                 }
 
                 //If there's no players left in the lobby we close it.
