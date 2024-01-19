@@ -11,10 +11,16 @@ import network.game.player.Player;
  */
 public record Bet(Player player, int diceValue, int diceNumber) {
 
+    /**
+     * @return The value of the dice but as a String.
+     */
     public String diceValueString() {
         return this.diceValue == 1 ? "J" : "" + this.diceValue;
     }
 
+    /**
+     * @return The Bet but in a convenient String format.
+     */
     public String toString() {
         return "(Dice Value: " + this.diceValueString() + " | Bet Number: " + this.diceNumber + ")";
     }

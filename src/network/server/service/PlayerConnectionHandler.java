@@ -13,15 +13,31 @@ import utils.logger.LoggerLevel;
  */
 public class PlayerConnectionHandler implements Runnable {
     private final Logger LOGGER;
-    private final Lobby lobby; //The lobby the player is in.
-    private final Player player; //The instance of the player.
 
+    /**
+     * The lobby the player is in.
+     */
+    private final Lobby lobby;
+
+    /**
+     * The instance of the player.
+     */
+    private final Player player;
+
+    /**
+     * The constructor of the class.
+     * @param lobby The lobby the player is in.
+     * @param player  The instance of the player.
+     */
     public PlayerConnectionHandler(Lobby lobby, Player player) {
         this.lobby = lobby;
         this.player = player;
         this.LOGGER = new Logger("ConnectionHandler(" + player.getName() + ")");
     }
 
+    /**
+     * Manages the Player's connection to the server and lobby. Also manages player's responses to this
+     */
     @Override
     public void run() {
         try {

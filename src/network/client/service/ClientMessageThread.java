@@ -14,13 +14,28 @@ import utils.logger.LoggerLevel;
  */
 public class ClientMessageThread implements Runnable {
     private final Logger LOGGER = new Logger("Client");
+    /**
+     * This client's socket.
+     */
     private final Socket client;
+    /**
+     * This client's main thread.
+     */
     private final Client clientThread;
+
+    /**
+     * Constructor for the class.
+     * @param client This client's socket.
+     * @param clientThread This client's main thread.
+     */
     public ClientMessageThread(Socket client, Client clientThread) {
         this.client = client;
         this.clientThread = clientThread;
     }
 
+    /**
+     * This method manages the Server's commands in the Client or simple messages.
+     */
     @Override
     public void run() {
         try {

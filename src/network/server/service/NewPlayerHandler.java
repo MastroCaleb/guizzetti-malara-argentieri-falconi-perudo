@@ -129,31 +129,28 @@ public class NewPlayerHandler implements Runnable {
                         break;
                     }
                     else if(!lobby.isPublic()){
-                        while(true) {
-                            this.player.ask("ForPassword");
+                        this.player.ask("ForPassword");
 
-                            String password = inputStream.readUTF();
+                        String password = inputStream.readUTF();
 
-                            if (lobby.getSettings().getPassword().equals(password)) {
+                        if (lobby.getSettings().getPassword().equals(password)) {
 
-                                if(!lobby.hasStarted()){
-                                    this.player.sendToThis("Correct password.");
-                                    this.player.sendToThis("Connecting to this lobby...");
-                                    lobby.joinLobby(this.player);
-                                }
-                                else if (lobby.wasDisconnected(player)) {
-                                    this.player.sendToThis("Correct password.");
-                                    this.player.sendToThis("Reconnecting to this lobby...");
-                                    lobby.reJoinLobby(this.player);
-                                }
-
-                                break;
+                            if(!lobby.hasStarted()){
+                                this.player.sendToThis("Correct password.");
+                                this.player.sendToThis("Connecting to this lobby...");
+                                lobby.joinLobby(this.player);
                             }
-                            else {
-                                this.player.sendToThis("Wrong password.");
+                            else if (lobby.wasDisconnected(player)) {
+                                this.player.sendToThis("Correct password.");
+                                this.player.sendToThis("Reconnecting to this lobby...");
+                                lobby.reJoinLobby(this.player);
                             }
+
+                            break;
                         }
-                        break;
+                        else {
+                            this.player.sendToThis("Wrong password.");
+                        }
                     }
                 }
                 else if(createOrJoin.equals("updateLobby")){

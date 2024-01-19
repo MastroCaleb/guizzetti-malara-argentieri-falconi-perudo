@@ -7,12 +7,35 @@ import java.net.Socket;
 import java.util.LinkedList;
 import network.server.lobbies.Lobby;
 
+/**
+ * The Player class has every information about a Player.
+ */
 public class Player {
-    private final String name; //This player's name.
-    private final Socket client; //This player's socket.
-    private LinkedList<Dice> dices = new LinkedList<>(); //This player's dices.
-    private String playerInteraction; //This player's last sent packet.
+    /**
+     * This player's name.
+     */
+    private final String name;
 
+    /**
+     * This player's socket.
+     */
+    private final Socket client;
+
+    /**
+     * This player's dices.
+     */
+    private LinkedList<Dice> dices = new LinkedList<>();
+
+    /**
+     * This player's last sent packet.
+     */
+    private String playerInteraction;
+
+    /**
+     * The constructor of the class.
+     * @param name This player's name.
+     * @param client This player's socket.
+     */
     public Player(String name, Socket client) {
         this.name = name;
         this.client = client;

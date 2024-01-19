@@ -30,10 +30,18 @@ public class Client implements Runnable {
     private final Socket client;
     private DataOutputStream outputStream;
 
+    /**
+     * Opens a connection to the Server at the specified IP and Port.
+     * @param ip The IP of the Server.
+     * @param port The Port of the Server.
+     */
     public Client(String ip, int port) throws IOException {
         this.client = new Socket(ip, port);
     }
 
+    /**
+     * Manages the player's actions after receiving a command and sends the packet to the Server as a response.
+     */
     @Override
     public void run() {
         try {
@@ -76,6 +84,9 @@ public class Client implements Runnable {
         catch (Exception ignored) {}
     }
 
+    /**
+     * Sends the player's Nickname.
+     */
     public void canSendNick() throws IOException {
         canSendNick = false;
         System.out.println("[--PROFILE--]");
@@ -85,6 +96,9 @@ public class Client implements Runnable {
         outputStream.writeUTF(name);
     }
 
+    /**
+     * Sends if the player wants to Create or Join a lobby.
+     */
     public void canCreateOrJoin() throws IOException {
         canCreateOrJoin = false;
         System.out.println("[--CREATE OR JOIN--]");
@@ -113,6 +127,9 @@ public class Client implements Runnable {
         }
     }
 
+    /**
+     * Sets the Player's preferred lobby settings, serializes them and sends them to the Server.
+     */
     public void canSendLobbySettings() throws IOException {
         canSendLobbySettings = false;
 
@@ -229,6 +246,9 @@ public class Client implements Runnable {
         outputStream.writeUTF(lobbySettingsPacket.write());
     }
 
+    /**
+     * If the lobby the player is joining is private this runs and asks for the password.
+     */
     public void canSendPassword() throws IOException {
         canSendPassword = false;
 
@@ -238,6 +258,9 @@ public class Client implements Runnable {
         outputStream.writeUTF(password);
     }
 
+    /**
+     * Asks the Host of the lobby if he wants to start the game.
+     */
     public void canStartGame() throws IOException {
         canStartGame = false;
 
@@ -251,6 +274,9 @@ public class Client implements Runnable {
         }
     }
 
+    /**
+     * Asks the Player the first bet of the game or the first bet of the new Round.
+     */
     public void canStartBet() throws IOException {
         canStartBet = false;
 
@@ -264,6 +290,9 @@ public class Client implements Runnable {
         outputStream.writeUTF("startBet:" + betPacket.write());
     }
 
+    /**
+     * Asks the Player to send an action (This is used for Doubt and Change Bets in the game).
+     */
     public void canSendAction() throws IOException {
         canSendAction = false;
 
@@ -277,6 +306,9 @@ public class Client implements Runnable {
         }
     }
 
+    /**
+     * Sends what the Player wants to change about the last Bet.
+     */
     public void canSendNewBet() throws IOException {
         canSendNewBet = false;
 
@@ -299,6 +331,10 @@ public class Client implements Runnable {
         }
     }
 
+    /**
+     * If the Sock It rule is active, we ask if the player wants to declare Sock It or not.
+     * @throws IOException
+     */
     public void canSendSockIt() throws IOException {
         canSendSockIt = false;
 
@@ -322,6 +358,9 @@ public class Client implements Runnable {
         }
     }
 
+    /**
+     * Stops this process from receiving more commands and closes itself.
+     */
     public void stop() throws IOException, InterruptedException {
         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
         keepGoing = false;

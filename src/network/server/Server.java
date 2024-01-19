@@ -16,14 +16,33 @@ import utils.logger.LoggerLevel;
  */
 public class Server implements Runnable {
     private final Logger LOGGER = new Logger("MainServer");
-    private final ServerSocket serverSocket; //The server's socket.
-    public final static LinkedList<Player> players = new LinkedList<>(); //List of all players.
-    public final static LinkedList<Lobby> lobbies = new LinkedList<>(); //List of all lobbies.
 
+    /**
+     * The server's socket.
+     */
+    private final ServerSocket serverSocket;
+
+    /**
+     * List of all players.
+     */
+    public final static LinkedList<Player> players = new LinkedList<>();
+
+    /**
+     * List of all lobbies.
+     */
+    public final static LinkedList<Lobby> lobbies = new LinkedList<>();
+
+    /**
+     * The constructor of the class. Also starts the Server to allow connections.
+     * @param port The port on which this server is opened on.
+     */
     public Server(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
     }
 
+    /**
+     * Manages the connection of new Clients.
+     */
     @Override
     public void run() {
         System.out.println("Server Started");

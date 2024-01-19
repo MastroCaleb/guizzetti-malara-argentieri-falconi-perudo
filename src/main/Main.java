@@ -7,8 +7,21 @@ import network.client.Client;
 import network.server.Server;
 import utils.input.In;
 
+/**
+ * The Main class to start either a Server or a Client.
+ */
 public class Main{
     public static String filename = ""; //The file position of this application's ".jar"
+
+    /**
+     * Main method of the program.
+     * <p>
+     * If it's being run on an IDE it uses the IDE's terminal.
+     * <p>
+     * If it's being run on a ".jar" file it opens the OS's terminal.
+     *
+     * @param args Process arguments.
+     */
     public static void main(String[] args) throws IOException, InterruptedException {
         filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6); //Obtain the ".jar" position.
         if(isConsole()){

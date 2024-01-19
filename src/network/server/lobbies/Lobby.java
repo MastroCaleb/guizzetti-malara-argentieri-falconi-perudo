@@ -16,21 +16,57 @@ import utils.logger.LoggerLevel;
  * This class manages a Thread of a Lobby.
  */
 public class Lobby implements Runnable {
-    private final LobbySettings lobbySettings; //This lobby's settings.
-    private final Logger LOGGER;
-    private final LinkedList<Player> players = new LinkedList<>(); //The players inside this lobby.
-    private final LinkedList<Player> disconnectedPlayers = new LinkedList<>(); //The players that disconnected from this lobby.
-    private volatile boolean startSent = false; //If the lobby asked to start the game.
-    private volatile boolean hasStarted = false; //If the game has started.
-    private Player host; //The host of the lobby, the player that created it.
-    private GameManager gameManager; //If null the game hasn't started. Otherwise, it contains the current game's instance.
 
+    /**
+     * This lobby's settings.
+     */
+    private final LobbySettings lobbySettings;
+    private final Logger LOGGER;
+
+    /**
+     * The players inside this lobby.
+     */
+    private final LinkedList<Player> players = new LinkedList<>();
+
+    /**
+     * The players that disconnected from this lobby.
+     */
+    private final LinkedList<Player> disconnectedPlayers = new LinkedList<>();
+
+    /**
+     * If the lobby asked to start the game.
+     */
+    private volatile boolean startSent = false;
+
+    /**
+     * If the game has started.
+     */
+    private volatile boolean hasStarted = false;
+
+    /**
+     * The host of the lobby, the player that created it.
+     */
+    private Player host;
+
+    /**
+     * If null the game hasn't started. Otherwise, it contains the current game's instance.
+     */
+    private GameManager gameManager;
+
+    /**
+     * The constructor of the class. Also sets the Logger's ID.
+     * @param host The player that created the lobby.
+     * @param lobbySettings This lobby's settings.
+     */
     public Lobby(Player host, LobbySettings lobbySettings) {
         this.host = host;
         this.lobbySettings = lobbySettings;
         this.LOGGER = new Logger("Lobby(" + lobbySettings.getLobbyCode() + ")");
     }
 
+    /**
+     * Manages the lobby. Starts games and ends games. If lobby has no players, this closes it.
+     */
     @Override
     public void run() {
         try {
@@ -312,29 +348,6 @@ public class Lobby implements Runnable {
             }
         }
     }
-
-// --Commented out by Inspection START (19/01/2024 12:38):
-//    /**
-//     * Sends a message to all players except a specified one.
-//     * @param message The contents of the message.
-//     * @param except The player excluded from receiving the message.
-//     */
-//    public void sendToAllExcept(String message, Player except) {
-//        if (!this.players.isEmpty()) {
-//            for(Player p : players) {
-//                if(!p.equals(except)){
-//                    try{
-//                        DataOutputStream outputStream = new DataOutputStream(p.getClient().getOutputStream());
-//                        outputStream.writeUTF(message);
-//                    }
-//                    catch(IOException e){
-//                        this.leaveLobby(p);
-//                    }
-//                }
-//            }
-//        }
-//    }
-// --Commented out by Inspection STOP (19/01/2024 12:38)
 
     /**
      * Removes from the disconnected list a player that reconnected.

@@ -18,23 +18,59 @@ import java.util.LinkedList;
 @SuppressWarnings("deprecation")
 public class GameManager implements Runnable {
     private final Logger LOGGER = new Logger("GameManager");
-    private Bet currentBet = null; //The last bet that was made. This is null if the game just started or a new Round started.
-    private int round = 1; //Number of rounds.
-    private final Lobby lobby; //The lobby that this game was started in.
-    private boolean hasFinished = false; //If the game has ended.
+    /**
+     * The last bet that was made. This is null if the game just started or a new Round started.
+     */
+    private Bet currentBet = null;
+
+    /**
+     * Number of rounds.
+     */
+    private int round = 1;
+
+    /**
+     * The lobby that this game was started in.
+     */
+    private final Lobby lobby;
+
+    /**
+     * If the game has ended or not.
+     */
+    private boolean hasFinished = false;
 
     //PALIFIC
-    private boolean palific = false; //If there is a palific player.
-    private int palificRound = 0; //This regulates if diceValue can be changed (if there's a palific player it shouldn't be changed)
+    /**
+     * If there is a palific player.
+     */
+    private boolean palific = false;
+
+    /**
+     * This regulates if diceValue can be changed (if there's a palific player it shouldn't be changed)
+     */
+    private int palificRound = 0;
 
     //SOCK IT
-    private Player sockItUser = null; //The player that called Sock It.
-    private boolean sockIt = false; //If sock it was called or not.
+    /**
+     * The player that called Sock It.
+     */
+    private Player sockItUser = null;
 
+    /**
+     * If sock it was called or not.
+     */
+    private boolean sockIt = false;
+
+    /**
+     * The constructor of the class.
+     * @param lobby The lobby where this game was started.
+     */
     public GameManager(Lobby lobby) {
         this.lobby = lobby;
     }
 
+    /**
+     * This manages the game logic.
+     */
     @Override
     public void run() {
         //We get how many players this game started with.

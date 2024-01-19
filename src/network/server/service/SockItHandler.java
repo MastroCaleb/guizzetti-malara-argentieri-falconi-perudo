@@ -11,14 +11,31 @@ import utils.logger.LoggerLevel;
 public class SockItHandler implements Runnable{
 
     private final Logger LOGGER;
-    private final Player player; //The instance of the player.
-    private final GameManager gameManager; //The game the player is in.
 
+    /**
+     * The instance of the player.
+     */
+    private final Player player;
+
+    /**
+     * The game the player is in.
+     */
+    private final GameManager gameManager;
+
+    /**
+     * The constructor of the class.
+     * @param player The instance of the player.
+     * @param gameManager The game the player is in.
+     */
     public SockItHandler(Player player, GameManager gameManager){
         this.player = player;
         this.gameManager = gameManager;
         this.LOGGER = new Logger("SockItHandler(" + player.getName() + ")");
     }
+
+    /**
+     * Manages if this player wants to declare "Sock It".
+     */
     @Override
     public void run(){
         try{
