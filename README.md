@@ -15,4 +15,4 @@
 
 ## Bonus
 
-È possibile avviare il gioco dal file .jar e giocare usando le console del sistema operativo.
+È possibile avviare il gioco dal file .jar e giocare usando la console del sistema operativo.
