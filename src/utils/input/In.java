@@ -10,6 +10,9 @@ import java.io.InputStreamReader;
 public class In {
     private static final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
+    /**
+     * @return Asks for an input and returns it.
+     */
     public static String nextLine() {
         while(true) {
             try {
@@ -21,6 +24,9 @@ public class In {
         }
     }
 
+    /**
+     * @return Asks for an input and returns it.
+     */
     public static int nextInt() {
         while(true) {
             try {
