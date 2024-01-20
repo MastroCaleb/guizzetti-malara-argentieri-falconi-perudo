@@ -1,5 +1,8 @@
 package utils.serializer;
 
+import utils.logger.Logger;
+import utils.logger.LoggerLevel;
+
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 
@@ -8,6 +11,8 @@ import java.util.LinkedList;
  */
 @SuppressWarnings("all")
 public class Serializer {
+
+    private static final Logger LOGGER = new Logger("Serializer");
 
     /**
      * This method serializes each one of the object's field and value into a string.
@@ -40,7 +45,7 @@ public class Serializer {
             }
         }
         catch (IllegalAccessException e) {
-            System.out.println("ERROR");
+            LOGGER.log(LoggerLevel.ERROR, "Serializing error. A field is not accessible.");
         }
 
         return values.toString();
