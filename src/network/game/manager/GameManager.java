@@ -157,7 +157,7 @@ public class GameManager implements Runnable {
 
                             //We show all players the new bet.
                             if(currentBet != null){
-                                this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.toString());
+                                this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.showBet());
                             }
                         }
                         else {
@@ -294,7 +294,7 @@ public class GameManager implements Runnable {
                                         if (newBet.contains("diceValue:")) {
                                             //if the new dice value is a usable one we change the current bet and go to the next turn. Otherwise, we repeat the loop.
                                             if (this.setNewDiceValue(player, Integer.parseInt(newBet.replace("diceValue:", "")))) {
-                                                this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.toString());
+                                                this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.showBet());
                                                 break;
                                             }
                                         }
@@ -302,7 +302,7 @@ public class GameManager implements Runnable {
                                         else if (newBet.contains("diceNumber:")) {
                                             //if the new dice number is a usable one we change the current bet and go to the next turn. Otherwise, we repeat the loop.
                                             if(this.setNewDiceNumber(player, Integer.parseInt(newBet.replace("diceNumber:", "")))){
-                                                this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.toString());
+                                                this.lobby.sendToAll(player.getName() + " made the bet: " + this.currentBet.showBet());
                                                 break;
                                             }
                                         }

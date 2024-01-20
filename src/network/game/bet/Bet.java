@@ -21,7 +21,7 @@ public record Bet(Player player, int diceValue, int diceNumber) {
     /**
      * @return The Bet but in a convenient String format.
      */
-    public String toString() {
+    public String showBet() {
         return "(Dice Value: " + this.diceValueString() + " | Bet Number: " + this.diceNumber + ")";
     }
 }
