@@ -52,6 +52,7 @@ public class Main{
      */
     private static void startPerudo(){
         try {
+            loop:
             while(true) {
                 System.out.println("[---START MENU---]");
                 System.out.println();
@@ -67,7 +68,7 @@ public class Main{
                         int port = In.nextInt();
 
                         (new Thread(new Server(port))).start();
-                        break;
+                        break loop;
                     }
                     case "2": {
 
@@ -78,10 +79,10 @@ public class Main{
                         int port = In.nextInt();
 
                         (new Thread(new Client(ip, port))).start();
-                        break;
+                        break loop;
                     }
                     case "3":
-                        break;
+                        break loop;
                 }
             }
         }
