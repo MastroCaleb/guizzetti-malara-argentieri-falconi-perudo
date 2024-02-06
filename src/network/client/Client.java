@@ -341,8 +341,8 @@ public class Client implements Runnable {
         System.out.println();
         System.out.println("[--CALL SOCK IT--]");
         System.out.println("Calling Sock It checks if the last bet is PERFECT.");
-        System.out.println("- If it is you get a dice (WIN).");
-        System.out.println("- If it's not you lose a dice (LOSE).");
+        System.out.println("- If it is, you get a dice (WIN).");
+        System.out.println("- If it's not, you lose a dice (LOSE).");
         System.out.println();
         System.out.println("1. Sock It");
         System.out.println("2. No");
